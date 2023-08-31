@@ -108,13 +108,16 @@ class API
             case 'get_activity':
                 $this->get_activity($data);
                 break;
+            case 'sign_up':
+                $this->sign_up($data);
+                break;
             default:
                 $this->return_data('400', 'Type is expected or is incorrect', 'error');
                 break;
         }
     }
 
-    private function handleSignupRequest($request_body)
+    private function sign_up($request_body)
     {
         // Validate the input
         $email = $request_body['email'];
@@ -169,7 +172,13 @@ class API
         $send = array(
             'message' => "Signup successful!"
         );
-        $this->return_data('200', $send, "success");
+        $return = array(
+            'message' => "Login Successful!",
+            'api_key' => $api_key
+        );
+        header("Location: PAGES/activity.php?api_key=$api_key");
+        exit();
+        //$this->return_data('200', $send, "success");
     }
 
     private function handleLoginRequest($request_body)
@@ -333,7 +342,7 @@ class API
         {
             $this->return_data('400', $result, 'error');
         }
-        header("Location: PAGES/home.php?api_key=".$statement['api_key']);
+        header("Location: PAGES/home.php?api_key=" . $statement['api_key']);
         exit();
         //$this->return_data('200', 'Article Successfully added', 'success');
     }
