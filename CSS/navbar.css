@@ -1,0 +1,31 @@
+.centered-bottom-div {
+  text-align: center;
+  padding: 10px;
+  /*background-color: black;*/
+  /*opacity: 50%;*/
+  border: 2px solid black;
+}
+
+.background-nav{
+  background-color: black;
+  opacity: 75%;
+  border: 2px solid transparent;
+  height: 100%;
+  width: 100%;
+}
+
+.nav-main-border,
+.nav-item-border {
+  background-color: black;
+  border: 2px solid black;
+}
+
+.nav-main-border a,
+.nav-item-border a {
+  opacity: 1;
+  background-color: white;
+  color: black ;
+}
+.nav-custom img {
+  color: black;
+}

@@ -1,0 +1,257 @@
+{
+    "SELECT": 
+    {
+        "tables":["table_1", "table_2"],
+        "columns":[
+            [
+                "column_1", "column_2"
+            ],
+            [
+                "column_1", "column_2"
+            ]
+        ],
+        "join": {
+            "tables":["table_3", "table_4"],
+            "columns":[
+                {
+                    "column_1":
+                    [
+                        "value", "comparison",
+                        ["table", "column"], "comparison"
+                    ]
+                },
+                {
+                    "column_1":
+                    [
+                        "value", "comparison",
+                        ["table", "column"], "comparison"
+                    ]
+                }
+            ]   
+        },
+        "left_join": {
+            "tables":["table_3", "table_4"],
+            "columns":[
+                {
+                    "column_1":
+                    [
+                        "value", "comparison",
+                        ["table", "column"], "comparison"
+                    ]
+                },
+                {
+                    "column_1":
+                    [
+                        "value", "comparison",
+                        ["table", "column"], "comparison"
+                    ]
+                }
+            ]   
+        },
+        "right_join": {
+            "tables":["table_3", "table_4"],
+            "columns":[
+                {
+                    "column_1":
+                    [
+                        "value", "comparison",
+                        ["table", "column"], "comparison"
+                    ]
+                },
+                {
+                    "column_1":
+                    [
+                        "value", "comparison",
+                        ["table", "column"], "comparison"
+                    ]
+                }
+            ]   
+        },
+        "where":{
+            "table_1": {
+                "column_1":
+                [
+                    "value", "comparison",
+                    ["table", "column"], "comparison"
+                ],
+                "column_2": 
+                [
+                    "value", "comparison",
+                    ["table", "column"], "comparison"
+                ]
+            },
+            "table_2": {
+                "column_1":
+                [
+                    "value", "comparison",
+                    ["table", "column"], "comparison"
+                ],
+                "column_2": 
+                [
+                    "value", "comparison",
+                    ["table", "column"], "comparison"
+                ]
+            }
+            
+        },
+        "order_by":{
+            "table_1":[
+               { "column_1": "order"}
+            ]
+        },
+        "limit": "limit"
+    },
+    "simple SELECT":{
+        "tables": "table",
+        "columns": ["column_1", "column_2"],
+        "where": {
+            "column_1": ["value", "comparison", "inclusion ie AND OR"],
+            "column_2": ["value", "comparison"]
+        },
+        "order_by": {
+            "column_1": "order",
+            "column_2": "order"
+        },
+        "limit": "limit"
+    },
+    "INSERT":{
+        "table": "table",
+        "data":{
+            "column_1": "value",
+            "column_2": "value"
+        }
+    },
+    "old":
+    {
+        "examples": {
+          "manage_wines": [
+            {
+              "type": "manage",
+              "options": {
+                "operation": "DELETE",
+                "table": "wines"
+              },
+              "details": {
+                "table": "wines",
+                "ID": "WINE ID"
+              }
+            },
+      
+            {
+              "type": "manage",
+              "options": {
+                "operation": "UPDATE",
+                "table": "wines"
+              },
+              "details": {
+                "table": "wines",
+                "ID": "WINE ID",
+                "data": {
+                  "image": "URL of wine",
+                  "type": "new type",
+                  "price": "new price",
+                  "user_rating": 4.5,
+                  "quality": 92,
+                  "alcohol": 0.2,
+                  "rating_percentile": "not sure if this should be here as it is derived",
+                  "grape_type": "Merlot",
+                  "price_percentile": "not sure if this should be here as it is derived",
+                  "description": "description"
+                }
+              }
+            },
+            {
+              "type": "manage",
+              "options": {
+                "operation": "INSERT",
+                "table": "wines"
+              },
+              "details": {
+                "table": "wines",
+                "ID": "Just put whatever here it is going to be overwritten",
+                "data": {
+                  "image": "URL of wine",
+                  "type": "new type",
+                  "price": "new price",
+                  "user_rating": 4.5,
+                  "quality": 92,
+                  "alcohol": 0.2,
+                  "rating_percentile": "not sure if this should be here as it is derived",
+                  "grape_type": "Merlot",
+                  "price_percentile": "not sure if this should be here as it is derived",
+                  "description": "description"
+                }
+              }
+            }
+          ],
+          "get_random": {
+            "type": "get_random",
+            "table": "wines",
+            "details": ["type", "wine_id", "price"],
+            "limit": 5
+          },
+          "get_by_conditions unordered": {
+            "type": "get_by_conditions",
+            "table": "wineries",
+            "details": "*",
+            "conditions": {
+              "winery_id": "217265"
+            },
+            "limit": 5,
+            "options": "*"
+          },
+      
+          "get_by_conditions ordered": {
+            "fuzzy example": {
+              "type": "get_by_conditions",
+              "table": "wines",
+              "details": "*",
+              "conditions": {
+                "price": 15
+              },
+              "limit": 5,
+              "options": {
+                "order": "DESC",
+                "sort_type": "price"
+              },
+              "fuzzy": true
+            },
+            "greater than example": {
+              "type": "get_by_conditions",
+              "table": "wines",
+              "details": "*",
+              "conditions": {
+                "price": 15
+              },
+              "limit": 5,
+              "options": {
+                "order": "DESC",
+                "sort_type": "price"
+              },
+              "gt_lt": "<"
+            }
+          },
+          "add_images": {
+            "type": "add_images",
+            "images": [
+              { "The wines ID": "The image URL" },
+              { "The wines ID": "The image URL" },
+              { "The wines ID": "The image URL" },
+              { "The wines ID": "The image URL" }
+            ]
+          },
+          "suggest": {
+            "type": "suggest",
+            "options": {
+              "order": "ASC",
+              "sort_type": "quality"
+            },
+            "location": {
+              "province": "Paarl"
+            },
+            "limit": 5
+          }
+        }
+      }
+      
+}

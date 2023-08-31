@@ -1,0 +1,97 @@
+@import url("https://fonts.googleapis.com/css2?family=Roboto+Mono&display=swap");
+
+/*@import url(https://fonts.googleapis.com/css?family=Exo:100);*/
+
+@font-face {
+  font-family: general_page;
+  src: url("https://fonts.googleapis.com/css2?family=Roboto+Mono&display=swap");
+}
+
+:root {
+  --back-ground: white;
+  --color: black;
+
+  --active-black: #222222;
+  --unselected: #3e3e3e;
+  --border: #4e4e4e;
+
+  /* Pallete */
+  /*--primary: #0D1B2A;
+    --primary-2: #1B263B;
+    --light-primary: #415A77;
+    --light-primary-2: #778DA9;
+    --white: #E0E1DD;*/
+
+  --light-blue: #add7f6;
+  --light-dark-blue: #87bfff;
+  --blue: #3f8efc;
+  --dark-light-blue: #2667ff;
+  --dark-blue: #3b28cc;
+}
+
+body {
+  /*background-image: url('../IMAGES/y-so-serious.png') !important;*/
+  background-image: url("../IMAGES/y-so-serious-white.png") !important;
+  /*background-size: cover !important;*/
+  background-repeat: repeat !important;
+  font-family: general_page !important;
+}
+
+.card {
+  background-color: var(--back-ground) !important;
+  color: var(--color) !important;
+  border-radius: 0 !important;
+}
+
+.form-control {
+  border-top: 0 !important;
+  border-right: 0 !important;
+  border-radius: 0% !important;
+  border-bottom-right-radius: 0% !important;
+  border-color: black !important;
+}
+
+.custom-control {
+  border: 2px solid black !important;
+  border-radius: 0% !important;
+}
+
+.form-control:focus {
+  /*outline: none !important;*/
+  /*-webkit-tap-highlight-color: transparent; */
+  box-shadow: none !important;
+}
+
+.input-group span {
+  position: relative;
+  z-index: 99;
+  opacity: 0;
+  transform: translateY(5%);
+  left: -100%;
+  top: 0;
+  background: #222222 ;
+  text-align: center;
+  color: white;
+  padding: 5px;
+}
+
+.form-control textarea {
+  border-top: 2px !important;
+  border-right: 2px !important;
+}
+
+
+.input-group input:focus,.input-group .form-control:focus {
+  border-width: 2px !important;
+  border-top: 2px !important;
+  border-right: 2px !important;
+}
+
+.input-group input:focus ~ span {
+  opacity: 1 !important ;
+  transition: ease-in 0.5s;
+  left: -50%;
+  top: -100%;
+}
+
+
