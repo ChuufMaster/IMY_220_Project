@@ -1,29 +1,31 @@
-<div class="position-fixed bottom-0 start-50 translate-middle-x w-auto nav-custom">
-    <div class="centered-bottom-div" id="navbar-styler">
-        <div class="background-nav w-100 h-100"></div>
+<div class="position-fixed bottom-0 start-50 translate-middle-x w-auto nav-custom mb-3 ">
+    <div class="centered-bottom-div rounded" id="navbar-styler">
         <nav class="navbar navbar-expand-lg">
-            <div class="nav-main-border px-1 py-2">
-                <a class="navbar-brand text-black" href="#">
-                    <img src="../../IMAGES/logo.svg" alt="" width="30" height="24">
+            <div class="nav-main-border p-1 rounded">
+                <a class="navbar-brand rounded p-3" href="#">
                     Article Hub
                 </a>
             </div>
-            <ul class="navbar-nav mx-1 p-1 w-auto">
-                <li class="nav-item mx-1 px-1 w-auto">
-                    <div class="nav-item-border px-1 py-2">
-                        <a class="nav-link mx-2 px-5 text-black" href="#">
-                            HOME
-                        </a>
-                    </div>
-                </li>
-                <li class="nav-item mx-1 px -1">
-                    <div class="nav-item-border px-1 py-2">
-                        <a class="nav-link mx-2 px-5 text-black" href="#">
-                            ACTIVITY
-                        </a>
-                    </div>
-                </li>
-            </ul>
+            <div class="navbar-group-custom rounded me-1">
+                <ul class="navbar-nav p-1 w-auto ">
+                    <li class="nav-item mx-1 px-1 w-auto">
+                        <div class="nav-item-border p-1 rounded">
+                            <a class="nav-link mx-2 px-5 rounded" <?php echo 'href="home.php?api_key='.$_GET['api_key'].'"' ?>>
+                                <i class="fa fa-house"></i>
+                                HOME
+                            </a>
+                        </div>
+                    </li>
+                    <li class="nav-item px-1">
+                        <div class="nav-item-border p-1">
+                            <a class="nav-link mx-2 px-5 rounded" <?php echo 'href="activity.php?api_key='.$_GET['api_key'].'"' ?>>
+                                <i class="fa-solid fa-hashtag"></i>
+                                ACTIVITY
+                            </a>
+                        </div>
+                    </li>
+                </ul>
+            </div>
         </nav>
     </div>
 </div>

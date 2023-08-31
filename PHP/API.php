@@ -96,9 +96,6 @@ class API
 
         switch ($type)
         {
-            case 'login_signup':
-                $this->login_signup($data);
-                break;
             case 'login':
                 $this->handleLoginRequest($data);
                 break;
@@ -108,49 +105,15 @@ class API
             case 'add_article':
                 $this->add_article($data);
                 break;
+            case 'get_activity':
+                $this->get_activity($data);
+                break;
             default:
                 $this->return_data('400', 'Type is expected or is incorrect', 'error');
                 break;
         }
     }
 
-    private function delete_from_table($table, $id, $column_name)
-    {
-
-        $result = $this->db->delete($table, array($column_name => $id));
-
-        if (gettype($result) === 'string')
-            $this->return_data('500', $result, 'error');
-
-        $this->return_data('200', $result, 'success');
-    }
-
-    private function update_table($table, $id, $data, $column_name)
-    {
-        $this->check_set('data', 'Details must be set', $data['details']);
-
-        $details = $data['details']['data'];
-
-        $result = $this->db->update($table, $details, array($column_name => $id));
-
-        if (gettype($result) === 'string')
-            $this->return_data('500', $result, 'error');
-
-        $this->return_data('200', 'Table successfully updated', 'success');
-    }
-
-    private function login_signup($data)
-    {
-        switch ($data['login_signup_type'])
-        {
-            case 'signup':
-                $this->handleSignupRequest($data);
-                break;
-            case 'login':
-                $this->handleLoginRequest($data);
-                break;
-        }
-    }
     private function handleSignupRequest($request_body)
     {
         // Validate the input
@@ -251,7 +214,7 @@ class API
                 'message' => "Login Successful!",
                 'api_key' => $api_key
             );
-            header("Location: PAGES/home.php?api_key=$api_key");
+            header("Location: PAGES/activity.php?api_key=$api_key");
             exit();
             //$this->return_data('200', $return, "Success");
         }
@@ -298,7 +261,7 @@ class API
         $this->check_set('date', 'Date must be set', $data);
         if (!isset($_FILES['image']))
         {
-            
+
             $this->return_data('400', $_FILES['image'], 'error');
         }
         $image_name = "";
@@ -314,14 +277,14 @@ class API
                     die;
                 }
 
-                $gallery = dirname(dirname(__FILE__)).'/gallery';
+                $gallery = dirname(dirname(__FILE__)) . '/gallery';
                 if (!file_exists($gallery))
                 {
                     mkdir($gallery, 0755, true);
                 }
 
                 $image_name = uniqid("image_", true) . ".png";
-                $path = dirname(dirname(__FILE__)).'/gallery/' . $image_name;
+                $path = dirname(dirname(__FILE__)) . '/gallery/' . $image_name;
                 if (move_uploaded_file($image, $path))
                 {
                     //echo "File uploaded successfully and moved to '$path'.";
@@ -361,8 +324,8 @@ class API
             "data" => [
                 'image_name' => $image_name,
                 'article_id' => [
-                    "(SELECT article_id FROM tbarticles WHERE api_key = '".$data['api_key']."' AND title = '".$data['title']."' LIMIT 1)"]
-                
+                    "(SELECT article_id FROM tbarticles WHERE api_key = '" . $data['api_key'] . "' AND title = '" . $data['title'] . "' LIMIT 1)"]
+
                 ]
             ];
         $result = $this->db->INSERT($statement);
@@ -370,7 +333,40 @@ class API
         {
             $this->return_data('400', $result, 'error');
         }
-        $this->return_data('200', 'Article Successfully added', 'success');
+        header("Location: PAGES/home.php?api_key=".$statement['api_key']);
+        exit();
+        //$this->return_data('200', 'Article Successfully added', 'success');
+    }
+
+    public function get_activity($data)
+    {
+        $statement = [
+            'tables' => ["tbarticles"],
+            'left_join' => [
+                "tables" => ['tbgallery'],
+                'columns' => [
+                        ["article_id" => [
+                            ["tbarticles", "article_id"], "="
+                        ]]
+                    ]
+                    ],
+            "order_by" => [
+                "tbarticles" => [
+                    "date" => "DESC"
+                ]
+            ]
+            ];
+        $result = $this->db->SELECT($statement);
+        if (gettype($result) === 'string')
+        {
+            $this->return_data("500", $result, 'error');
+        }
+        while ($row = mysqli_fetch_assoc($result))
+        {
+            $response[] = $row;
+        }
+
+        $this->return_data('200', $response, 'Success');
     }
 
 }

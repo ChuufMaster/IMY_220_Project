@@ -47,8 +47,8 @@ body {
   border-top: 0 !important;
   border-right: 0 !important;
   border-radius: 0% !important;
-  border-bottom-right-radius: 0% !important;
   border-color: black !important;
+  border-width: 2px !important;
 }
 
 .custom-control {

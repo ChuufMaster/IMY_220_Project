@@ -84,10 +84,11 @@ class Database
         e.salary DESC
     LIMIT 10;
  */
-    public function check_isset($statement, $callback){
-        if(!isset($statement))
+    public function check_isset($statement, $key, $callback)
+    {
+        if (!isset($statement[$key]))
             return '';
-        return $this->$callback($statement);
+        return $this->$callback($statement[$key]);
     }
     public function SELECT($statement, $execute = true)
     {
@@ -96,36 +97,52 @@ class Database
         {
             $query .= isset($statement['columns']) ? $this->columns($statement['columns']) : '*';
             $query .= ' FROM ' . $statement['tables'];
-            $query .= (isset($statement['where']))? (' WHERE '. $this->conditionals($statement["where"])): '';
-            $query .= isset($statement['order_by'])? $this->check_isset($statement['order_by'], 'order_by') : '';
+            $query .= (isset($statement['where'])) ? (' WHERE ' . $this->conditionals($statement["where"])) : '';
+            $query .= isset($statement['order_by']) ? $this->check_isset($statement, 'order_by', 'order_by') : '';
             $query .= isset($statement['limit']) ? " LIMIT $statement[limit] " : '';
             return $execute === true ? $this->execute_query($query) : $query;
         }
 
-        for ($table_index = 0; $table_index < count($statement["tables"]); $table_index++)
-        {
-            $table = $statement["tables"][$table_index];
-            $query .= $this->columns($statement["columns"][$table_index], $table);
-        }
+        if (isset($statement['columns']))
+            for ($table_index = 0; $table_index < count($statement["tables"]); $table_index++)
+            {
+                $table = $statement["tables"][$table_index];
+                $query .= $this->columns($statement["columns"][$table_index], $table);
+            }
+        else
+            $query .= ' *';
         $query .= ' FROM ';
         for ($table_index = 0; $table_index < count($statement["tables"]); $table_index++)
         {
             $table = $statement["tables"][$table_index];
-            $query .= $table;
+            $query .= $table . ' ' . $table;
         }
-        $query .= $this->joins($statement["join"], "JOIN");
-        $query .= $this->joins($statement["left_join"], "LEFT JOIN");
-        $query .= $this->joins($statement["right_join"], "RIGHT JOIN");
-        $query .= " WHERE ";
-        foreach($statement["where"] as $table_name => $conditions){
-            $query .= $this->conditionals($conditions, $table_name).", ";
+        if (isset($statement["join"]))
+            $query .= $this->joins($statement["join"], "JOIN");
+        if (isset($statement["left_join"]))
+            $query .= $this->joins($statement["left_join"], "LEFT JOIN");
+        if (isset($statement["right_join"]))
+            $query .= $this->joins($statement["right_join"], "RIGHT JOIN");
+
+        if (isset($statement["where"]))
+        {
+            $query .= " WHERE ";
+            foreach ($statement["where"] as $table_name => $conditions)
+            {
+                $query .= $this->conditionals($conditions, $table_name) . ", ";
+            }
+            $query = rtrim($query, ", ");
         }
-        $query = rtrim($query, ", ");
-        
-        foreach($statement["order_by"] as $table_name => $order){
-            $query .= $this->order_by($order, $table_name).",";
+
+        if (isset($statement['order_by']))
+        {
+            $query .= ' ORDER BY ';
+            foreach ($statement["order_by"] as $table_name => $order)
+            {
+                $query .= $this->order_by($order, $table_name) . ",";
+            }
+            $query = rtrim($query, ", ");
         }
-        $query = rtrim($query, ", ");
 
         $query .= isset($statement['limit']) ? " LIMIT $statement[limit] " : '';
         return $execute === true ? $this->execute_query($query) : $query;
@@ -145,10 +162,10 @@ class Database
         if (!isset($conditions) || empty($conditions))
             return '';
         $condition = '';
-        $table = $table !== '' ? $table.'.' : '';
+        $table = ($table !== '' ? $table . '.' : '');
         foreach ($conditions as $column => $value)
         {
-            $condition .= "$table$column $value[1] ".(is_array($value[0]) ? $value[0][0] . "." . $value[0][1] : "'".$value[0]."'")." ".isset($value[2]) ? $value[2] : '';
+            $condition .= "$table$column $value[1] " . (is_array($value[0]) ? $value[0][0] . "." . $value[0][1] : "'" . $value[0] . "'") . " " . (isset($value[2]) ? $value[2] : '');
         }
         //return $condition = rtrim($condition, ', ');
         return $condition;
@@ -158,12 +175,12 @@ class Database
     {
         if (!isset($order_by))
             return '';
-        $order = " ORDER BY ";
+        $order_out = "";
         foreach ($order_by as $column => $order)
         {
-            $order .= "$table.$column $order, ";
+            $order_out .= " $table.$column $order, ";
         }
-        return $order = rtrim($order, ', ');
+        return $order_out = rtrim($order_out, ', ');
     }
 
     public function joins($join, $join_type)
@@ -244,12 +261,16 @@ class Database
     {
         $columns = implode(', ', array_keys($statement['data']));
         //$values = implode("', '", array_values($statement['data']));
-        $values ='';
-        foreach($statement['data'] as $value){
-            if(!is_array($value)){
-                $values .= "'".$value."', ";
-            }else{
-                $values .= $value[0].", ";
+        $values = '';
+        foreach ($statement['data'] as $value)
+        {
+            if (!is_array($value))
+            {
+                $values .= "'" . $value . "', ";
+            }
+            else
+            {
+                $values .= $value[0] . ", ";
             }
         }
         $values = rtrim($values, ", ");
@@ -257,7 +278,8 @@ class Database
         //echo $statement;    
         $query = "INSERT INTO $table ($columns) VALUES ($values)";
 
-        if($execute) $this->execute_query($query);
+        if ($execute)
+            $this->execute_query($query);
 
         return $execute ? mysqli_insert_id($this->connection) : $query;
     }
