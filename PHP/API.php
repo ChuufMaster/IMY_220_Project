@@ -28,9 +28,12 @@ class API
     public function __construct()
     {
         $this->host = "localhost";
+        /*$this->username = "u21456552";
+        $this->password = "jdqmbgai";
+        $this->database_name = "u21456552";*/
         $this->username = "root";
         $this->password = "";
-        $this->database_name = "IMY_21456552";
+        $this->database_name = "imy_21456552";
         $this->db = Database::instance($this->host, $this->username, $this->password, $this->database_name);
     }
 
@@ -93,6 +96,7 @@ class API
     {
         $this->check_set('type', 'Type must be set', $data);
         $type = $data['type'];
+        //$this->return_data('400', 'Request Body expected', "error");
 
         switch ($type)
         {

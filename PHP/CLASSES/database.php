@@ -22,12 +22,12 @@ class Database
     // Connect to the database
     private function connect($host, $username, $password, $database)
     {
-        $connection = mysqli_connect($host, $username, $password, $database);
+        $connection = new mysqli($host, $username, $password, $database);
 
         // Check connection
-        if (mysqli_connect_errno())
+        if ($connection->connect_error)
         {
-            die('Failed to connect to MySQL: ' . mysqli_connect_error());
+            die('Failed to connect to MySQL: ' . $connection->connect_error);
         }
 
         return $connection;
@@ -36,12 +36,12 @@ class Database
     // Execute an SQL query
     public function execute_query($query)
     {
-        $result = mysqli_query($this->connection, $query);
+        $result = $this->connection->query($query);
 
         // Check for errors
         if (!$result)
         {
-            return mysqli_error($this->connection);
+            return $this->connection->error;
         }
 
         return $result;
