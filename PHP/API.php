@@ -1,7 +1,15 @@
+<!DOCTYPE html>
+<html lang="en">
+
+
+<?php include "/INCLUDES/header.php";
+    require "configs/congfig.php";
+?>
 <?php
 // Assuming you have established a database connection
-require_once 'CLASSES/Database.php';
-
+require_once 'CLASSES/database.php';
+error_reporting(E_ALL);
+ini_set('display_errors', 1);
 class API
 {
     private $host;
@@ -28,12 +36,12 @@ class API
     public function __construct()
     {
         $this->host = "localhost";
-        /*$this->username = "u21456552";
+        $this->username = "u21456552";
         $this->password = "jdqmbgai";
-        $this->database_name = "u21456552";*/
-        $this->username = "root";
-        $this->password = "";
-        $this->database_name = "imy_21456552";
+        $this->database_name = "u21456552";
+        //$this->username = "root";
+        //$this->password = "";
+        //$this->database_name = "imy_21456552";
         $this->db = Database::instance($this->host, $this->username, $this->password, $this->database_name);
     }
 
@@ -73,6 +81,7 @@ class API
 
     public function request()
     {
+        //echo "poes";
         $json = file_get_contents('php://input');
         $data = json_decode($json, true);
         if ($data === null)
@@ -217,7 +226,7 @@ class API
             );
             $this->return_data('400', $return, "error");
         }
-        $row = mysqli_fetch_assoc($result);
+        $row = $result->fetch_assoc();
         $db_password = $row['password'];
         //$salted_password = $row['salt'] . $password;
         if ($password === $db_password)
@@ -386,5 +395,16 @@ class API
 
 $api = API::instance();
 $api->request();
+echo "poes";
 
 ?>
+<body>
+    <div>
+        poes
+    </div>
+</body>
+<footer>
+    <?php include "../INCLUDES/footer.php" ?>
+</footer>
+
+</html>

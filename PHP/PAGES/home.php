@@ -3,10 +3,140 @@
 
 
 <?php include "../INCLUDES/header.php" ?>
+<?php
+error_reporting(E_ALL);
+ini_set('display_errors', 1);
+if ($_SERVER['REQUEST_METHOD'] === "POST")
+{
+    //$add_article = new add();
+    //$add_article->add_article($_POST);
+    $data = $_POST;
+    require_once("../configs/congfig.php");
+    $db = new mysqli($host, $username, $password, $database_name);
+    if ($db->connect_error)
+    {
+        echo $db->connect_error;
+    }
+    //    $this->check_set('title', 'Title must be set', $data);
+//    $this->check_set('author', 'Author must be set', $data);
+//    $this->check_set('body', 'Body must be set', $data);
+//    $this->check_set('date', 'Date must be set', $data);
+    if (!isset($_FILES['image']))
+    {
 
+        //$this->return_data('400', $_FILES['image'], 'error');
+    }
+    $image_name = "";
+    foreach ($_FILES['image']['error'] as $key => $error)
+    {
+        if ($error === UPLOAD_ERR_OK)
+        {
+            $image = $_FILES['image']['tmp_name'][$key];
+            $imageInfo = getimagesize($image);
+            if ($imageInfo !== false && $imageInfo['mime'] !== 'image/png')
+            {
+                echo "File must be a PNG image";
+                die;
+            }
+
+            $gallery = dirname(dirname(__FILE__)) . '/gallery';
+            //if (!file_exists($gallery))
+            //{
+            //    mkdir($gallery, 0755, true);
+            //}
+
+            $image_name = uniqid("image_", true) . ".png";
+            $path = dirname(dirname(__FILE__)) . '/gallery/' . $image_name;
+            //if (move_uploaded_file($image, $path))
+            //{
+            //    //echo "File uploaded successfully and moved to '$path'.";
+            //}
+            //else
+            //{
+            //    echo "Error moving file.";
+            //    die;
+            //}
+        }
+    }
+
+    /*$query = "INSERT INTO tbarticles (user_id, title, description, author, date)
+                          VALUES ((SELECT user_id FROM tbusers WHERE email = '$email'),
+                                  '$article_name',
+                                  '$article_description',
+                                  '$article_author',
+                                  '$article_date')";*/
+
+    $statement = [
+        'table' => "tbarticles",
+        'data' => [
+    'api_key' => $data['api_key'],
+    'title' => $data['title'],
+    'description' => $data['description'],
+    'author' => $data['author'],
+    'date' => $data['date'],
+    'body' => $data['body']
+    ]
+    ];
+    /*$tableName = $statement['table'];
+    $dataArray = $statement['data'];
+    $columns = implode(', ', array_keys($dataArray));
+    $placeholders = implode(', ', array_fill(0, count($dataArray), '?'));*/
+    //$query = "INSERT INTO $tableName ($columns) VALUES ($placeholders)";
+
+    $api_key = $data["api_key"];
+    $title = $data["title"];
+    $description = $data["description"];
+    $author = $data["author"];
+    $date = $data["date"];
+    $body = $data["body"];
+
+    $query = "INSERT INTO tbarticles (api_key,title,description,author,date,body) 
+        VALUES ($api_key, $title, $description, $author, $date, $body)";
+    $result = $db->query($query);
+    if (!$result)
+    {
+        echo "POES";
+    }
+    /* $query = "INSERT INTO tbgallery (image_name, article_id)
+    VALUES ('$image_name', (SELECT article_id FROM tbarticles WHERE user_id = '$userid' AND title = '$article_name' LIMIT 1))";*/
+    $statement = [
+        'table' => 'tbgallery',
+        "data" => [
+            'image_name' => $image_name,
+            'article_id' => [
+                "(SELECT article_id FROM tbarticles WHERE api_key = '" . $data['api_key'] . "' AND title = '" . $data['title'] . "' LIMIT 1)"]
+
+                ]
+        ];
+    $title = $data['$title'];
+    $api_key = $_GET["api_key"];
+    $tableName = $statement['table'];
+    $dataArray = $statement['data'];
+    //$columns = implode(', ', array_keys($dataArray));
+    //$placeholders = implode(', ', array_fill(0, count($dataArray), '?'));
+    //$query = "INSERT INTO $tableName ($columns) VALUES ($placeholders)";
+
+    $query = "INSERT INTO tbgallery
+        (image_name, article_id) VALUES
+        ($image_name,
+            SELECT article_id FROM tbarticles WHERE api_key='$api_key' AND title = '$title' LIMIT 1)
+    ";
+    $result = $db->query($query);
+    //$result = $this->db->INSERT($statement);
+    if (gettype($result) === 'string')
+    {
+        //$this->return_data('400', $result, 'error');
+    }
+    header("Location: home.php?api_key=" . $_GET['api_key']);
+    //exit();
+//$this->return_data('200', 'Article Successfully added', 'success');
+
+
+}
+?>
 
 <body>
-<script src="../../SCRIPTS/script.js"></script>
+    <script src="../../SCRIPTS/script.js"></script>
 
     <div class="container mt-5 mb-5">
         <div class="row justify-content-center align-items-center">
@@ -19,20 +149,23 @@
                         <div class="card-body w-100 h-75">
                             <!-- ========================= CARD BODY ========================= -->
                             <h1>ADD ARTICLE</h1>
-                            <form class="row m-3" action="../API.php" method="POST" id="add_article_form"
-                                enctype='multipart/form-data'>
+                            <form class="row m-3" <?php echo 'action="home.php?api_key=' . $_GET["api_key"] . '"' ?>
+                                method="POST" id="add_article_form" enctype='multipart/form-data'>
                                 <div class="min-h-75 w-35 input-group row g-3">
                                     <div class="col">
-                                        <input type="text" class="w-100 form-control" placeholder="title" name="title" required></input>
+                                        <input type="text" class="w-100 form-control" placeholder="title" name="title"
+                                            required></input>
                                     </div>
                                     <div class="col">
-                                        <input type="text" class="w-100 form-control" placeholder="author" name="author" required></input>
+                                        <input type="text" class="w-100 form-control" placeholder="author" name="author"
+                                            required></input>
                                     </div>
                                 </div>
                                 <div class="input-group row g-3">
 
                                     <div class="col">
-                                        <input type="text" class="w-100 form-control" placeholder="description" name="description" required></input>
+                                        <input type="text" class="w-100 form-control" placeholder="description"
+                                            name="description" required></input>
                                     </div>
                                     <div class="col">
                                         <input type="date" class="w-100 form-control" name="date" required></input>
@@ -40,10 +173,11 @@
                                 </div>
                                 <div class="min-h-75 input-group mt-5 w-100">
                                     <input type='file' class='form-control' name='image[]' id='image'
-                                        multiple='multiple'  required/>
+                                        multiple='multiple' required />
                                 </div>
                                 <div class="min-h-75 input-group my-5">
-                                    <textarea class="w-100 form-control" placeholder="body" name="body" required></textarea>
+                                    <textarea class="w-100 form-control" placeholder="body" name="body"
+                                        required></textarea>
                                 </div>
                                 <input type="hidden" value="add_article" name="type">
                                 <input type="hidden" value=<?php echo '"' . $_GET['api_key'] . '"' ?> name="api_key">

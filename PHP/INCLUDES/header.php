@@ -1,3 +1,4 @@
+<?php require "../configs/congfig.php" ?>
 <head>
     <title>ArticleHub</title>
     <!-- Required meta tags -->
