@@ -8,23 +8,17 @@ error_reporting(E_ALL);
 ini_set('display_errors', 1);
 if ($_SERVER['REQUEST_METHOD'] === "POST")
 {
-    //$add_article = new add();
-    //$add_article->add_article($_POST);
     $data = $_POST;
-    require_once("../configs/congfig.php");
+    require "../configs/config.php";
     $db = new mysqli($host, $username, $password, $database_name);
     if ($db->connect_error)
     {
         echo $db->connect_error;
     }
-    //    $this->check_set('title', 'Title must be set', $data);
-//    $this->check_set('author', 'Author must be set', $data);
-//    $this->check_set('body', 'Body must be set', $data);
-//    $this->check_set('date', 'Date must be set', $data);
+
     if (!isset($_FILES['image']))
     {
 
-        //$this->return_data('400', $_FILES['image'], 'error');
     }
     $image_name = "";
     foreach ($_FILES['image']['error'] as $key => $error)
@@ -39,49 +33,21 @@ if ($_SERVER['REQUEST_METHOD'] === "POST")
                 die;
             }
 
-            $gallery = dirname(dirname(__FILE__)) . '/gallery';
-            //if (!file_exists($gallery))
-            //{
-            //    mkdir($gallery, 0755, true);
-            //}
+            $gallery = dirname(dirname(dirname(__FILE__))) . '/gallery';
 
             $image_name = uniqid("image_", true) . ".png";
-            $path = dirname(dirname(__FILE__)) . '/gallery/' . $image_name;
-            //if (move_uploaded_file($image, $path))
-            //{
-            //    //echo "File uploaded successfully and moved to '$path'.";
-            //}
-            //else
-            //{
-            //    echo "Error moving file.";
-            //    die;
-            //}
+            $path = dirname(dirname(dirname(__FILE__))) . '/gallery/' . $image_name;
+            if (move_uploaded_file($image, $path))
+                {
+                    //echo "File uploaded successfully and moved to '$path'.";
+                }
+                else
+                {
+                    echo "Error moving file.";
+                    die;
+                }
         }
     }
-
-    /*$query = "INSERT INTO tbarticles (user_id, title, description, author, date)
-                          VALUES ((SELECT user_id FROM tbusers WHERE email = '$email'),
-                                  '$article_name',
-                                  '$article_description',
-                                  '$article_author',
-                                  '$article_date')";*/
-
-    $statement = [
-        'table' => "tbarticles",
-        'data' => [
-    'api_key' => $data['api_key'],
-    'title' => $data['title'],
-    'description' => $data['description'],
-    'author' => $data['author'],
-    'date' => $data['date'],
-    'body' => $data['body']
-    ]
-    ];
-    /*$tableName = $statement['table'];
-    $dataArray = $statement['data'];
-    $columns = implode(', ', array_keys($dataArray));
-    $placeholders = implode(', ', array_fill(0, count($dataArray), '?'));*/
-    //$query = "INSERT INTO $tableName ($columns) VALUES ($placeholders)";
 
     $api_key = $data["api_key"];
     $title = $data["title"];
@@ -91,35 +57,17 @@ if ($_SERVER['REQUEST_METHOD'] === "POST")
     $body = $data["body"];
 
     $query = "INSERT INTO tbarticles (api_key,title,description,author,date,body) 
-        VALUES ($api_key, $title, $description, $author, $date, $body)";
+        VALUES ('$api_key', '$title', '$description', '$author', '$date', '$body')";
     $result = $db->query($query);
     if (!$result)
     {
         echo "POES";
     }
-    /* $query = "INSERT INTO tbgallery (image_name, article_id)
-    VALUES ('$image_name', (SELECT article_id FROM tbarticles WHERE user_id = '$userid' AND title = '$article_name' LIMIT 1))";*/
-    $statement = [
-        'table' => 'tbgallery',
-        "data" => [
-            'image_name' => $image_name,
-            'article_id' => [
-                "(SELECT article_id FROM tbarticles WHERE api_key = '" . $data['api_key'] . "' AND title = '" . $data['title'] . "' LIMIT 1)"]
-
-                ]
-        ];
-    $title = $data['$title'];
-    $api_key = $_GET["api_key"];
-    $tableName = $statement['table'];
-    $dataArray = $statement['data'];
-    //$columns = implode(', ', array_keys($dataArray));
-    //$placeholders = implode(', ', array_fill(0, count($dataArray), '?'));
-    //$query = "INSERT INTO $tableName ($columns) VALUES ($placeholders)";
 
     $query = "INSERT INTO tbgallery
         (image_name, article_id) VALUES
-        ($image_name,
-            SELECT article_id FROM tbarticles WHERE api_key='$api_key' AND title = '$title' LIMIT 1)
+        ('$image_name',
+            (SELECT article_id FROM tbarticles WHERE api_key = '$api_key' AND title = '$title' LIMIT 1))
     ";
     $result = $db->query($query);
     //$result = $this->db->INSERT($statement);

@@ -6,7 +6,7 @@
 require_once '../CLASSES/database.php';
 if ($_SERVER["REQUEST_METHOD"] === "POST")
 {
-    require "../configs/congfig.php";
+    require "../configs/config.php";
     $db = new mysqli($host, $username, $password, $database_name);
     $request_body = $_POST;
     if ($request_body["type"] === 'login')
@@ -94,14 +94,6 @@ if ($_SERVER["REQUEST_METHOD"] === "POST")
             header("Location: ../../index.html");
             //$this->return_data('400', $send, "error");
         }
-        // Generate a random salt
-        //$salt = bin2hex(random_bytes(6));
-
-        // Combine the salt with the password
-        //$salted_password = $salt . $password;
-
-        // Hash the salted password
-        //$hashed_password = password_hash($salted_password, PASSWORD_DEFAULT);
 
         $api_key = bin2hex(random_bytes(16));
         $statement = [
@@ -145,24 +137,9 @@ if ($_SERVER["REQUEST_METHOD"] === "POST")
             $data = array(
                 'type' => 'get_activity',
             );
-
-            // Initialize cURL session
-            //$ch = curl_init();
-            
-            // Set cURL options
-            //curl_setopt($ch, CURLOPT_URL, $url);
-            //curl_setopt($ch, CURLOPT_RETURNTRANSFER, true);
-            //curl_setopt($ch, CURLOPT_POST, true);
-            //curl_setopt($ch, CURLOPT_POSTFIELDS, http_build_query($data)); // Convert data to URL-encoded format
-            
-            // Execute cURL session and get the response
             
 
-            $host = "localhost";
-            $username = "u21456552";
-            $password = "jdqmbgai";
-            $database_name = "u21456552";
-
+            require "../configs/congfig.php";
             $db = new mysqli($host, $username, $password, $database_name);
             if ($db->connect_error)
             {

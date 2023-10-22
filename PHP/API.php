@@ -1,15 +1,14 @@
-<!DOCTYPE html>
-<html lang="en">
-
-
-<?php include "/INCLUDES/header.php";
-    require "configs/congfig.php";
-?>
 <?php
 // Assuming you have established a database connection
+
+header("Access-Control-Allow-Origin: http://localhost"); // Replace with your allowed origin
+header("Access-Control-Allow-Methods: GET, POST, PUT, DELETE, OPTIONS");
+header("Access-Control-Allow-Headers: Content-Type, Authorization");
+header("Access-Control-Allow-Credentials: true");
+
 require_once 'CLASSES/database.php';
-error_reporting(E_ALL);
-ini_set('display_errors', 1);
+//error_reporting(E_ALL);
+//ini_set('display_errors', 1);
 class API
 {
     private $host;
@@ -42,7 +41,9 @@ class API
         //$this->username = "root";
         //$this->password = "";
         //$this->database_name = "imy_21456552";
-        $this->db = Database::instance($this->host, $this->username, $this->password, $this->database_name);
+        //$this->db = Database::instance($this->host, $this->username, $this->password, $this->database_name);
+        require "./configs/config.php";
+        $this->db = Database::instance($host, $username, $password, $database_name);
     }
 
     private function return_data($header, $data, $status)
@@ -395,7 +396,6 @@ class API
 
 $api = API::instance();
 $api->request();
-echo "poes";
 
 ?>
 <body>

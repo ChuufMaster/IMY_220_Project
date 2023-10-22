@@ -1,5 +1,0 @@
-AuthType Basic
-AuthName "Student Files"
-AuthUserFile /var/www/html//u21456552/.htpasswd
-Require valid-user
-
