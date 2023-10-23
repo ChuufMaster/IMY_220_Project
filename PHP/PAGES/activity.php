@@ -107,7 +107,7 @@ if ($_SERVER["REQUEST_METHOD"] === "POST")
             ]
             ];
         //$this->db->INSERT($statement);
-        $result = $db->query("INSERT INTO users (email, password, first_name,last_name, api_key) VALUES ($email, $password, $first_name, $last_name, $api_key)");
+        $result = $db->query("INSERT INTO users (email, password, first_name,last_name, api_key) VALUES ('$email', '$password', '$first_name', '$last_name', '$api_key')");
         $send = array(
             'message' => "Signup successful!"
         );
@@ -124,12 +124,12 @@ if ($_SERVER["REQUEST_METHOD"] === "POST")
 
 <body>
     <div class="container mb-5 mt-3 pb-5">
-        <div class="row g-3">
+        <div class="row g-3" id="activityFeed">
             <?php
 
 
 
-            error_reporting(E_ALL);
+            /*error_reporting(E_ALL);
             ini_set('display_errors', 1);
             $url = 'http://localhost/IMY_220_Project/PHP/API.php';
 
@@ -139,7 +139,7 @@ if ($_SERVER["REQUEST_METHOD"] === "POST")
             );
             
 
-            require "../configs/congfig.php";
+            require "../configs/config.php";
             $db = new mysqli($host, $username, $password, $database_name);
             if ($db->connect_error)
             {
@@ -208,13 +208,15 @@ if ($_SERVER["REQUEST_METHOD"] === "POST")
             else
             {
                 echo 'No API response received.';
-            }
+            }*/
             ?>
         </div>
     </div>
 </body>
 
 <footer>
+<script type="module" src="../../SCRIPTS/activity.js"></script>
+
     <?php include "../INCLUDES/footer.php" ?>
 </footer>
 

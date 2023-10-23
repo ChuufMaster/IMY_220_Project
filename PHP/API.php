@@ -125,6 +125,20 @@ class API
             case 'sign_up':
                 $this->sign_up($data);
                 break;
+            case 'get_profile':
+                $this->get_profile($data);
+                break;
+            case 'get_MyArticles':
+                $this->get_MyArticles($data);
+                break;
+            case 'get_friends':
+                $this->get_friends($data);
+                break;
+            case 'get_friendsArticles':
+                $this->get_friendsArticles($data);
+                break;
+            case 'add_friend':
+                $this->add_friend($data);
             default:
                 $this->return_data('400', 'Type is expected or is incorrect', 'error');
                 break;
@@ -392,19 +406,212 @@ class API
         $this->return_data('200', $response, 'Success');
     }
 
+    public function get_profile($data)
+    {
+        $this->check_set("api_key", "Api key expected", $data);
+        $statement = [
+            "tables" => ["users"],
+            "where" =>
+            [
+                "users" => [
+                    "api_key" => [$data["api_key"], "="]
+                ]
+            ],
+            "left_join" => [
+                "tables" => ["profilegallery"],
+                "columns" => [
+                    ["api_key" => [
+                            ["users", "api_key"], "="
+                        ]]
+                ]
+            ]
+        ];
+        $result = $this->db->SELECT($statement);
+        if (gettype($result) == 'string')
+        {
+            $this->return_data("500", $result, 'error');
+        }
+
+        while ($row = mysqli_fetch_assoc($result))
+        {
+            $response[] = $row;
+        }
+
+        $this->return_data('200', $response, 'Success');
+    }
+
+    public function get_MyArticles($data)
+    {
+        $this->check_set('api_key', 'API key expected', $data);
+
+        $statement = [
+            'tables' => ["tbarticles"],
+            'left_join' => [
+                "tables" => ['tbgallery'],
+                'columns' => [
+                        ["article_id" => [
+                            ["tbarticles", "article_id"], "="
+                        ]]
+                    ]
+                    ],
+            "order_by" => [
+                "tbarticles" => [
+                    "date" => "DESC"
+                ]
+                ],
+            "where" => [
+                "tbarticles" => [
+                    "api_key" => [$data["api_key"], "="]
+                ]
+            ]
+            ];
+
+        $result = $this->db->SELECT($statement);
+        if (gettype($result) == 'string')
+        {
+            $this->return_data("500", $result, 'error');
+        }
+
+        while ($row = mysqli_fetch_assoc($result))
+        {
+            $response[] = $row;
+        }
+
+        $this->return_data('200', $response, 'Success');
+    }
+
+    public function get_friends($data)
+    {
+        $this->check_set('api_key', 'Api key expected', $data);
+
+        $statement = [
+            'tables' => ["friends"],
+            'left_join' => [
+                'tables' => ['users'],
+                'columns' => [
+                    ['api_key' => [
+                        ['friends', 'friend_id'], '='
+                    ]]
+                ]
+                    ],
+                    'where' => [
+                        'friends' => ['account_id' => [$data['api_key'], '=']]
+                    ]
+                    ];
+        $result = $this->db->SELECT($statement);
+        if (gettype($result) == 'string')
+        {
+            $this->return_data("500", $result, 'error');
+        }
+
+        while ($row = mysqli_fetch_assoc($result))
+        {
+            $response[] = $row;
+        }
+
+        $this->return_data('200', $response, 'Success');
+    }
+
+    public function get_friendsArticles($data)
+    {
+        $this->check_set('api_key', 'Api key expected', $data);
+
+        $statement = [
+            'tables' => ["friends"],
+            'left_join' => [
+                'tables' => ['users', 'tbarticles', 'tbgallery'],
+                'columns' => [
+                    ['api_key' => [
+                        ['friends', 'friend_id'], '='
+                    ]],
+                    ['api_key' => [
+                        ['friends', 'friend_id'], '='
+                    ]],
+                    ["article_id" => [
+                        ["tbarticles", "article_id"], "="
+                    ]]
+
+                ]
+                    ],
+                    'where' => [
+                        'friends' => ['account_id' => [$data['api_key'], '=']]
+                    ]
+                    ];
+        $result = $this->db->SELECT($statement);
+        if (gettype($result) == 'string')
+        {
+            $this->return_data("500", $result, 'error');
+        }
+
+        while ($row = mysqli_fetch_assoc($result))
+        {
+            $response[] = $row;
+        }
+
+        $this->return_data('200', $response, 'Success');
+    }
+
+    public function add_friend($data)
+    {
+        $this->check_set('friendName', 'Friend name expected', $data);
+        $this->check_set('api_key', 'API key expected', $data);
+
+        $statement = [
+            'tables' => 'users',
+            'where' => [
+                "email" => [$data['friendName'], '=']
+            ]];
+        $result = $this->db->SELECT($statement);
+
+        if (gettype($result) == 'string')
+        {
+            $this->return_data('500', $result, 'error');
+        }
+
+        while ($row = mysqli_fetch_assoc($result))
+        {
+            $response[] = $row;
+        }
+
+        if (count($response) <= 0)
+        {
+            $this->return_data('No user found', $response, 'error');
+        }
+
+        
+
+        $statement = [
+            "table" => "friends",
+            "data" => [
+                "account_id" => $data["api_key"],
+                "friend_id" => $response[0]["api_key"]
+            ]
+            ];
+
+        $result = $this->db->INSERT($statement);
+        if (gettype($result) == "string")
+        {
+            $this->return_data("500", $result, "error");
+        }
+        $statement = [
+            "table" => "friends",
+            "data" => [
+                "account_id" => $response[0]["api_key"],
+                "friend_id" => $data["api_key"]
+            ]
+            ];
+        $result = $this->db->INSERT($statement);
+
+        if (gettype($result) == "string")
+        {
+            $this->return_data("500", $result, "error");
+        }
+        $this->return_data('200', $response, 'Success');
+    }
+
 }
 
 $api = API::instance();
 $api->request();
 
 ?>
-<body>
-    <div>
-        poes
-    </div>
-</body>
-<footer>
-    <?php include "../INCLUDES/footer.php" ?>
-</footer>
-
-</html>

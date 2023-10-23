@@ -61,7 +61,6 @@ if ($_SERVER['REQUEST_METHOD'] === "POST")
     $result = $db->query($query);
     if (!$result)
     {
-        echo "POES";
     }
 
     $query = "INSERT INTO tbgallery
