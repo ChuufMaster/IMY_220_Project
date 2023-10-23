@@ -101,30 +101,30 @@ if ($_SERVER['REQUEST_METHOD'] === "POST")
                                 <div class="min-h-75 w-35 input-group row g-3">
                                     <div class="col">
                                         <input type="text" class="w-100 form-control" placeholder="title" name="title"
-                                            required></input>
+                                            required id="title"></input>
                                     </div>
                                     <div class="col">
                                         <input type="text" class="w-100 form-control" placeholder="author" name="author"
-                                            required></input>
+                                            required id="author"></input>
                                     </div>
                                 </div>
                                 <div class="input-group row g-3">
 
                                     <div class="col">
                                         <input type="text" class="w-100 form-control" placeholder="description"
-                                            name="description" required></input>
+                                            name="description" required id="description"></input>
                                     </div>
                                     <div class="col">
-                                        <input type="date" class="w-100 form-control" name="date" required></input>
+                                        <input type="date" class="w-100 form-control" name="date" required id="name"></input>
                                     </div>
                                 </div>
                                 <div class="min-h-75 input-group mt-5 w-100">
                                     <input type='file' class='form-control' name='image[]' id='image'
-                                        multiple='multiple' required />
+                                        multiple='multiple' required id="image"/>
                                 </div>
                                 <div class="min-h-75 input-group my-5">
                                     <textarea class="w-100 form-control" placeholder="body" name="body"
-                                        required></textarea>
+                                        required id="body"></textarea>
                                 </div>
                                 <input type="hidden" value="add_article" name="type">
                                 <input type="hidden" value=<?php echo '"' . $_GET['api_key'] . '"' ?> name="api_key">

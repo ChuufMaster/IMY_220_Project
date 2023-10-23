@@ -1,11 +1,3 @@
-/*export const config = () => {
-  return new Promise((resolve, reject) => {
-    $.getJSON("config.json", (json) => {
-      resolve(json);
-    });
-  });
-};*/
-
 import { apiURL } from "./configs.js";
 
 export const apiCall = (data) => {

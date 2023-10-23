@@ -400,6 +400,8 @@ class API
         }
         while ($row = mysqli_fetch_assoc($result))
         {
+            $tags = json_decode($row['tags'], true);
+            $row['tags'] = $tags;
             $response[] = $row;
         }
 
