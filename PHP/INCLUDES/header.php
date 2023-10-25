@@ -13,7 +13,7 @@
     <link rel="apple-touch-icon" sizes="180x180" href="../../FAVICON/apple-touch-icon.png" />
     <link rel="icon" type="image/png" sizes="32x32" href="../../FAVICON/favicon-32x32.png" />
     <link rel="icon" type="image/png" sizes="16x16" href="../../FAVICON/favicon-16x16.png" />
-    <link rel="manifest" href="../../FAVICON/site.webmanifest" />
+    <!--<link rel="manifest" href="../../FAVICON/site.webmanifest" />-->
     <!-- ========================= FAVICON ========================= -->
     <!-- Bootstrap JS -->
     <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/js/bootstrap.bundle.min.js"></script>

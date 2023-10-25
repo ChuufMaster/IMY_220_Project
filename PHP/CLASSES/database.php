@@ -284,8 +284,29 @@ class Database
         return $execute ? mysqli_insert_id($this->connection) : $query;
     }
 
+    public function UPDATE($statement, $execute = true)
+    {
+        $values = '';
+        foreach ($statement['data'] as $key => $value)
+        {
+            $values .= $key ."= '" . $value . "', "; 
+        }
+        
+        $values = rtrim($values, ", ");
+        $table = $statement['table'];
+        
+        $conditions = $this->conditionals($statement['where']);
+
+        $query = "UPDATE $table SET $values WHERE $conditions";
+
+        if ($execute)
+            $this->execute_query($query);
+
+        return $execute ? mysqli_insert_id($this->connection) : $query;
+    }
+
     // Perform an UPDATE query
-    public function update($table, $columns, $conditions)
+    /*public function update($table, $columns, $conditions)
     {
         if (!is_array($conditions))
         {
@@ -316,7 +337,7 @@ class Database
         return $this->execute_query($query);
         //return $query;
     }
-
+*/
     // Perform a DELETE query
     public function delete($table, $conditions)
     {

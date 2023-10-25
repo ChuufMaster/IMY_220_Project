@@ -27,7 +27,7 @@
                     <li class="nav-item px-1">
                         <div class="nav-item-border p-1">
                             <a class="nav-link mx-2 px-5 rounded" <?php echo 'href="friends.php?api_key=' . $_GET['api_key'] . '"' ?>>
-                                <i class="fa-solid fa-hashtag"></i>
+                                <i class="fa-solid fa-users"></i>
                                 FRIENDS
                             </a>
                         </div>
@@ -35,7 +35,7 @@
                     <li class="nav-item px-1">
                         <div class="nav-item-border p-1">
                             <a class="nav-link mx-2 px-5 rounded" <?php echo 'href="profile.php?api_key=' . $_GET['api_key'] . '"' ?>>
-                                <i class="fa-solid fa-hashtag"></i>
+                                <i class="fa-solid fa-user"></i>
                                 PROFILE
                             </a>
                         </div>

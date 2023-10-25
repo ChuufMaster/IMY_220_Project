@@ -108,7 +108,6 @@ class API
 
     public function request()
     {
-        //echo "poes";
         $json = file_get_contents('php://input');
         $data = json_decode($json, true);
         if ($data === null)
@@ -168,6 +167,15 @@ class API
             case 'get_user_profile':
                 $this->get_user_profile($data);
                 break;
+            case 'get_lists':
+                $this->get_lists($data);
+                break;
+            case 'update_info':
+                $this->update_info($data);
+                break;
+            case 'update_profile_pic':
+                $this->update_profile_pic($data);
+                break;
             default:
                 $this->return_data('400', 'Type is expected or is incorrect', 'error');
                 break;
@@ -223,6 +231,22 @@ class API
                 "first_name" => $first_name,
                 "last_name" => $last_name,
                 "api_key" => $api_key
+            ]
+            ];
+        $this->db->INSERT($statement);
+
+
+        $random_images = [
+            'doodle.png',
+            'existence.png',
+            'raccoon.jpg',
+            'react.jpeg'
+        ];
+        $statement = [
+            'table' => 'gallery',
+            'data' => [
+                'api_key' => $api_key,
+                'image_name' => $random_images[array_rand($random_images)]
             ]
             ];
         $this->db->INSERT($statement);
@@ -366,7 +390,7 @@ class API
             } // Its simple code.Its not with proper validation.
         }
 
-        echo ($data['tags']);
+        //echo ($data['tags']);
         $statement = [
             'table' => "tbarticles",
             'data' => [
@@ -533,15 +557,6 @@ class API
                     ]
                     ];
         $result = $this->db->SELECT($statement);
-        /*if (gettype($result) == 'string')
-        {
-            $this->return_data("500", $result, 'error');
-        }
-
-        while ($row = mysqli_fetch_assoc($result))
-        {
-            $response[] = $row;
-        }*/
         $response = $this->get_response($result);
         $this->return_data('200', $response, 'Success');
     }
@@ -572,17 +587,6 @@ class API
                     ]
                     ];
         $result = $this->db->SELECT($statement);
-        /*if (gettype($result) == 'string')
-        {
-            $this->return_data("500", $result, 'error');
-        }
-
-        while ($row = mysqli_fetch_assoc($result))
-        {
-            $tags = json_decode($row['tags'], true);
-            $row['tags'] = $tags;
-            $response[] = $row;
-        }*/
         $response = $this->get_response($result);
         $this->return_data('200', $response, 'Success');
     }
@@ -708,6 +712,139 @@ class API
 
     }
 
+    public function get_lists($data)
+    {
+        $this->check_set('api_key', 'Api key expected', $data);
+        $statement = [
+            'tables' => 'lists',
+            'where' => [
+                'api_key' => [$data['api_key'], '=']
+            ]
+            ];
+
+        $result = $this->db->SELECT($statement);
+        $response = $this->get_response($result);
+        $this->return_data('200', $response, 'Success');
+    }
+
+    public function add_list($data)
+    {
+        $this->check_set('api_key', 'Api key expected', $data);
+        $this->check_set('list', 'List expected', $data);
+        $this->check_set('name', 'List name expected', $data);
+
+        $statement = [
+            'table' => 'list',
+            'data' => [
+                'api_key' => $data['api_key'],
+                'list' => $data['list'],
+                'name' => $data['name']
+            ]
+            ];
+
+        $result = $this->db->INSERT($statement);
+        if (gettype($result) == "string")
+        {
+            $this->return_data("500", $result, "error");
+        }
+        $this->return_data('200', 'List successfully added', 'Success');
+    }
+
+    public function update_info($data)
+    {
+        $this->check_set('api_key', 'Api Key expected', $data);
+        $this->check_set('info_column', 'Info type expected', $data);
+        $this->check_set('info_value', 'Info value expected', $data);
+
+        $statement = [
+            'table' => 'users',
+            'data' => [
+                $data['info_column'] => $data['info_value']
+            ],
+            'where' => [
+                'api_key' => [$data['api_key'], '=']
+            ]
+        ];
+
+        $result = $this->db->UPDATE($statement);
+
+        if (gettype($result) == "string")
+        {
+            $this->return_data("500", $result, "error");
+        }
+        $this->return_data('200', 'Details successfully updated', 'Success');
+    }
+
+    public function update_profile_pic($data)
+    {
+        $this->check_set('api_key', 'Api Key expected', $data);
+        if (!isset($_FILES['picture']))
+        {
+
+            $this->return_data('400', $_FILES['picture'], 'error');
+        }
+
+        $image_name = "";
+
+        $filetype = array('jpeg', 'jpg', 'png', 'gif', 'PNG', 'JPEG', 'JPG');
+        foreach ($_FILES as $key)
+        {
+
+            $gallery = dirname(dirname(__FILE__)) . '/PROFILES';
+            if (!file_exists($gallery))
+            {
+                mkdir($gallery, 0755, true);
+            }
+
+            $file_name = $key['name'];
+            $file_ext = pathinfo($file_name, PATHINFO_EXTENSION);
+            $image_name = uniqid("image_", true) . "." . $file_ext;
+            $path = dirname(dirname(__FILE__)) . '/PROFILES/' . $image_name;
+            if (in_array(strtolower($file_ext), $filetype))
+            {
+
+                if (move_uploaded_file($key['tmp_name'], $path))
+                {
+                    //echo 'yes';
+                }
+                else
+                {
+                    //echo 'no';
+                }
+
+            }
+            else
+            {
+                echo "FILE_TYPE_ERROR";
+            } // Its simple code.Its not with proper validation.
+        }
+
+        /*$statement = [
+            'table' => 'profilegallery',
+            'data' => [
+                'api_key' => $data['api_key'],
+                'image_name' => $image_name
+            ]
+            ];*/
+        $statement = [
+            'table' => 'profilegallery',
+            'data' => [
+                'image_name' => $image_name
+            ],
+            'where' => [
+                'api_key' => [$data['api_key'], '=']
+                ]
+            ];
+        $result = $this->db->UPDATE($statement);
+        if (gettype($result) === 'string')
+        {
+
+            //$result = $this->db->UPDATE($statement);
+            $this->return_data('400', $result, 'error');
+
+        }
+        $this->return_data('200', $image_name, 'success');
+    }
 }
 
 $api = API::instance();

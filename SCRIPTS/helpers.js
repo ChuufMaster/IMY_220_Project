@@ -21,7 +21,7 @@ export const getKey = () => {
 };
 
 export const displayArticle = (data) => {
-  console.log(data);
+  //  console.log(data);
   let output = ` `;
   data.forEach((article) => {
     const {
@@ -84,7 +84,7 @@ export const displayArticle = (data) => {
 
 export const friendsList = (data) => {
   let output = ` `;
-  console.log(data);
+  //  console.log(data);
   data.forEach((friend) => {
     const { first_name, last_name, job, birthday, email } = friend;
     //./account.php?api_key=${getKey()}
@@ -112,17 +112,18 @@ export const viewProfile = (email) => {
       email: email,
       api_key: getKey(),
     }).then((data) => {
-      $.cookie("account", JSON.stringify(data));
+    //  console.log(data);
+      $.cookie(`account${getKey()}`, JSON.stringify(data));
       resolve(data);
     });
   });
 };
 
 export const displayProfile = (data) => {
-  console.log(data);
+  //  console.log(data);
   data = JSON.parse(data);
   const friends = data["data"]["friends"];
-  console.log(friends);
+  //  console.log(friends);
   const {
     first_name,
     last_name,
@@ -157,14 +158,11 @@ export const displayProfile = (data) => {
 export const takeToProfile = (me) => {
   let email = $(me).closest(".friends").find("input[type='hidden']").val();
 
-  console.log(email);
-  viewProfile(email)
-    .then((data) => {
-      console.log(data);
-      $.cookie("account", JSON.stringify(data));
-      console.log($.cookie("account"));
-    })
-    .then
-    //(window.location.href = `./account.php?api_key=${getKey()}`)
-    ();
+  //  console.log(email);
+  viewProfile(email).then(
+    (window.location.href = `./account.php?api_key=${getKey()}`)
+  );
+  //.then((data) => {
+  //  $.cookie(`account${getKey()}`, JSON.stringify(data));
+  //})
 };
