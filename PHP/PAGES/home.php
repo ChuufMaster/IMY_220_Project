@@ -1,10 +1,8 @@
 <!DOCTYPE html>
 <html lang="en">
-
-
 <?php include "../INCLUDES/header.php" ?>
 <?php
-error_reporting(E_ALL);
+/*error_reporting(E_ALL);
 ini_set('display_errors', 1);
 if ($_SERVER['REQUEST_METHOD'] === "POST")
 {
@@ -38,14 +36,14 @@ if ($_SERVER['REQUEST_METHOD'] === "POST")
             $image_name = uniqid("image_", true) . ".png";
             $path = dirname(dirname(dirname(__FILE__))) . '/gallery/' . $image_name;
             if (move_uploaded_file($image, $path))
-                {
-                    //echo "File uploaded successfully and moved to '$path'.";
-                }
-                else
-                {
-                    echo "Error moving file.";
-                    die;
-                }
+            {
+                //echo "File uploaded successfully and moved to '$path'.";
+            }
+            else
+            {
+                echo "Error moving file.";
+                die;
+            }
         }
     }
 
@@ -77,9 +75,7 @@ if ($_SERVER['REQUEST_METHOD'] === "POST")
     header("Location: home.php?api_key=" . $_GET['api_key']);
     //exit();
 //$this->return_data('200', 'Article Successfully added', 'success');
-
-
-}
+}*/
 ?>
 
 <body>
@@ -96,7 +92,7 @@ if ($_SERVER['REQUEST_METHOD'] === "POST")
                         <div class="card-body w-100 h-75">
                             <!-- ========================= CARD BODY ========================= -->
                             <h1>ADD ARTICLE</h1>
-                            <form class="row m-3" <?php echo 'action="home.php?api_key=' . $_GET["api_key"] . '"' ?>
+                            <div class="row m-3" <?php /*echo 'action="home.php?api_key=' . $_GET["api_key"] . '"' */?>
                                 method="POST" id="add_article_form" enctype='multipart/form-data'>
                                 <div class="min-h-75 w-35 input-group row g-3">
                                     <div class="col">
@@ -115,16 +111,34 @@ if ($_SERVER['REQUEST_METHOD'] === "POST")
                                             name="description" required id="description"></input>
                                     </div>
                                     <div class="col">
-                                        <input type="date" class="w-100 form-control" name="date" required id="name"></input>
+                                        <input type="date" class="w-100 form-control" name="date" required
+                                            id="date"></input>
                                     </div>
                                 </div>
                                 <div class="min-h-75 input-group mt-5 w-100">
                                     <input type='file' class='form-control' name='image[]' id='image'
-                                        multiple='multiple' required id="image"/>
+                                        multiple='multiple' required id="image" />
                                 </div>
                                 <div class="min-h-75 input-group my-5">
-                                    <textarea class="w-100 form-control" placeholder="body" name="body"
-                                        required id="body"></textarea>
+                                    <textarea class="w-100 form-control" placeholder="body" name="body" required
+                                        id="body"></textarea>
+                                </div>
+                                <div class="min-h-75 input-group my-5">
+                                    <input class="form-control" type="text" id="tagInput" placeholder="Enter a tag">
+                                </div>
+                                <div class="row my-3">
+                                    <div class="col-8">
+                                        <ul class="list-group" id="tagList"></ul>
+                                    </div>
+                                    <div class="col-4">
+                                        <a class="fancy" href="#" id="addTag">
+                                            <span class="overlay"></span>
+                                            <span class="top-key"></span>
+                                            <span class="text w-100">ADD TAG</span>
+                                            <span class="bottom-key-1"></span>
+                                            <span class="bottom-key-2"></span>
+                                        </a>
+                                    </div>
                                 </div>
                                 <input type="hidden" value="add_article" name="type">
                                 <input type="hidden" value=<?php echo '"' . $_GET['api_key'] . '"' ?> name="api_key">
@@ -149,6 +163,8 @@ if ($_SERVER['REQUEST_METHOD'] === "POST")
     </div>
 </body>
 <footer>
+    <script type="module" src="../../SCRIPTS/home.js"></script>
+
     <?php include "../INCLUDES/footer.php" ?>
 </footer>
 

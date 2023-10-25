@@ -80,6 +80,32 @@ class API
         return $data[$to_check];
     }
 
+    private function get_response($result)
+    {
+        $jsonKeys = [
+            "tags",
+            "list"
+        ];
+        if (gettype($result) == 'string')
+        {
+            $this->return_data("500", $result, 'error');
+        }
+
+        while ($row = mysqli_fetch_assoc($result))
+        {
+            foreach ($jsonKeys as $key)
+            {
+                if (isset($row[$key]))
+                {
+                    $column = json_decode($row[$key], true);
+                    $row[$key] = $column;
+                }
+            }
+            $response[] = $row;
+        }
+        return $response;
+    }
+
     public function request()
     {
         //echo "poes";
@@ -139,6 +165,9 @@ class API
                 break;
             case 'add_friend':
                 $this->add_friend($data);
+            case 'get_user_profile':
+                $this->get_user_profile($data);
+                break;
             default:
                 $this->return_data('400', 'Type is expected or is incorrect', 'error');
                 break;
@@ -296,51 +325,48 @@ class API
         $this->check_set('author', 'Author must be set', $data);
         $this->check_set('body', 'Body must be set', $data);
         $this->check_set('date', 'Date must be set', $data);
+        $this->check_set('tags', 'Tags must be set', $data);
         if (!isset($_FILES['image']))
         {
 
             $this->return_data('400', $_FILES['image'], 'error');
         }
+
         $image_name = "";
-        foreach ($_FILES['image']['error'] as $key => $error)
+
+        $filetype = array('jpeg', 'jpg', 'png', 'gif', 'PNG', 'JPEG', 'JPG');
+        foreach ($_FILES as $key)
         {
-            if ($error === UPLOAD_ERR_OK)
+
+            $gallery = dirname(dirname(__FILE__)) . '/gallery';
+            if (!file_exists($gallery))
             {
-                $image = $_FILES['image']['tmp_name'][$key];
-                $imageInfo = getimagesize($image);
-                if ($imageInfo !== false && $imageInfo['mime'] !== 'image/png')
-                {
-                    echo "File must be a PNG image";
-                    die;
-                }
+                mkdir($gallery, 0755, true);
+            }
 
-                $gallery = dirname(dirname(__FILE__)) . '/gallery';
-                if (!file_exists($gallery))
-                {
-                    mkdir($gallery, 0755, true);
-                }
+            $image_name = uniqid("image_", true) . ".png";
+            $path = dirname(dirname(__FILE__)) . '/gallery/' . $image_name;
+            $file_ext = pathinfo($image_name, PATHINFO_EXTENSION);
+            if (in_array(strtolower($file_ext), $filetype))
+            {
 
-                $image_name = uniqid("image_", true) . ".png";
-                $path = dirname(dirname(__FILE__)) . '/gallery/' . $image_name;
-                if (move_uploaded_file($image, $path))
+                if (move_uploaded_file($key['tmp_name'], $path))
                 {
-                    //echo "File uploaded successfully and moved to '$path'.";
+                    //echo 'yes';
                 }
                 else
                 {
-                    echo "Error moving file.";
-                    die;
+                    //echo 'no';
                 }
+
             }
+            else
+            {
+                echo "FILE_TYPE_ERROR";
+            } // Its simple code.Its not with proper validation.
         }
 
-        /*$query = "INSERT INTO tbarticles (user_id, title, description, author, date)
-                              VALUES ((SELECT user_id FROM tbusers WHERE email = '$email'),
-                                      '$article_name',
-                                      '$article_description',
-                                      '$article_author',
-                                      '$article_date')";*/
-
+        echo ($data['tags']);
         $statement = [
             'table' => "tbarticles",
             'data' => [
@@ -349,13 +375,17 @@ class API
                     'description' => $data['description'],
                     'author' => $data['author'],
                     'date' => $data['date'],
-                    'body' => $data['body']
+                    'body' => $data['body'],
+                    //'tags' => json_encode($data['tags'])
+                    'tags' => $data['tags']
                 ]
             ];
         $result = $this->db->INSERT($statement);
 
-        /* $query = "INSERT INTO tbgallery (image_name, article_id)
-                          VALUES ('$image_name', (SELECT article_id FROM tbarticles WHERE user_id = '$userid' AND title = '$article_name' LIMIT 1))";*/
+        if (gettype($result) === 'string')
+        {
+            $this->return_data('400', $result, 'error');
+        }
         $statement = [
             'table' => 'tbgallery',
             "data" => [
@@ -370,9 +400,9 @@ class API
         {
             $this->return_data('400', $result, 'error');
         }
-        header("Location: PAGES/home.php?api_key=" . $statement['api_key']);
-        exit();
-        //$this->return_data('200', 'Article Successfully added', 'success');
+        //header("Location: PAGES/home.php?api_key=" . $statement['api_key']);
+        //exit();
+        $this->return_data('200', 'Article Successfully added', 'success');
     }
 
     public function get_activity($data)
@@ -476,6 +506,8 @@ class API
 
         while ($row = mysqli_fetch_assoc($result))
         {
+            $tags = json_decode($row['tags'], true);
+            $row['tags'] = $tags;
             $response[] = $row;
         }
 
@@ -501,7 +533,7 @@ class API
                     ]
                     ];
         $result = $this->db->SELECT($statement);
-        if (gettype($result) == 'string')
+        /*if (gettype($result) == 'string')
         {
             $this->return_data("500", $result, 'error');
         }
@@ -509,8 +541,8 @@ class API
         while ($row = mysqli_fetch_assoc($result))
         {
             $response[] = $row;
-        }
-
+        }*/
+        $response = $this->get_response($result);
         $this->return_data('200', $response, 'Success');
     }
 
@@ -540,16 +572,18 @@ class API
                     ]
                     ];
         $result = $this->db->SELECT($statement);
-        if (gettype($result) == 'string')
+        /*if (gettype($result) == 'string')
         {
             $this->return_data("500", $result, 'error');
         }
 
         while ($row = mysqli_fetch_assoc($result))
         {
+            $tags = json_decode($row['tags'], true);
+            $row['tags'] = $tags;
             $response[] = $row;
-        }
-
+        }*/
+        $response = $this->get_response($result);
         $this->return_data('200', $response, 'Success');
     }
 
@@ -580,7 +614,7 @@ class API
             $this->return_data('No user found', $response, 'error');
         }
 
-        
+
 
         $statement = [
             "table" => "friends",
@@ -609,6 +643,69 @@ class API
             $this->return_data("500", $result, "error");
         }
         $this->return_data('200', $response, 'Success');
+    }
+
+    public function get_user_profile($data)
+    {
+        $this->check_set("api_key", 'Api Key expected', $data);
+        $this->check_set("email", 'Account Email expected', $data);
+
+        $statement = [
+            'tables' => ['users'],
+            'where' => [
+                'users' => [
+                    'email' => [$data['email'], '=']
+                ]
+            ],
+            'left_join' => [
+                'tables' => ['profilegallery'],
+                'columns' => [
+                    ['api_key' => [
+                        ['users', 'api_key'], '='
+                    ]]
+                ]
+            ]
+        ];
+        $result = $this->db->SELECT($statement);
+        if (gettype($result) == 'string')
+        {
+            $this->return_data("500", $result, 'error');
+        }
+
+        while ($row = mysqli_fetch_assoc($result))
+        {
+            $response[] = $row;
+        }
+        //var_dump($response);
+        $friendTest = [
+            'tables' => 'friends',
+            'where' => [
+                'account_id' => [$data['api_key'], '=', 'AND'],
+                'friend_id' => [$response[0]['api_key'], '=']
+            ]
+            ];
+
+        $friendResult = $this->db->SELECT($friendTest);
+
+        if (gettype($result) == 'string')
+        {
+            $this->return_data("500", $result, 'error');
+        }
+
+
+        //var_dump($friendResult);
+        if ($friendResult->num_rows > 0)
+        {
+
+            $response['friends'] = true;
+        }
+        else
+        {
+            $response['friends'] = false;
+        }
+
+        $this->return_data('200', $response, 'Success');
+
     }
 
 }

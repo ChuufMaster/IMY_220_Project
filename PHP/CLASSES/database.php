@@ -165,7 +165,7 @@ class Database
         $table = ($table !== '' ? $table . '.' : '');
         foreach ($conditions as $column => $value)
         {
-            $condition .= "$table$column $value[1] " . (is_array($value[0]) ? $value[0][0] . "." . $value[0][1] : "'" . $value[0] . "'") . " " . (isset($value[2]) ? $value[2] : '');
+            $condition .= "$table$column $value[1] " . (is_array($value[0]) ? $value[0][0] . "." . $value[0][1] : "'" . $value[0] . "'") . " " . (isset($value[2]) ? $value[2].' ' : '');
         }
         //return $condition = rtrim($condition, ', ');
         return $condition;

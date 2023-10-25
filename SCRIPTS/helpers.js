@@ -5,7 +5,8 @@ export const apiCall = (data) => {
     $.ajax({
       url: apiURL,
       type: "POST",
-      data: data,
+      data: JSON.stringify(data),
+      //  contentType: "application/json; charset=utf-8",
     }).done((response) => {
       resolve(response);
     });
@@ -23,8 +24,16 @@ export const displayArticle = (data) => {
   console.log(data);
   let output = ` `;
   data.forEach((article) => {
-    const { image_name, title, author, description, article_id, body, date } =
-      article;
+    const {
+      image_name,
+      title,
+      author,
+      description,
+      article_id,
+      body,
+      date,
+      tags,
+    } = article;
     output += `
         <div class="col-6">
         <div class="p-1 card h-100 fancy">
@@ -53,6 +62,13 @@ export const displayArticle = (data) => {
                                 </div>
                             </div>
                             <p class="card-text"><small class="text-muted">${date}</small></p>
+                            <p class="card-text"><small class="text-muted">${
+                              '<a class="link-primary" href="#"">#' +
+                              tags.tags.join(
+                                '</a>, <a class="link-primary" href="#">#'
+                              ) +
+                              "</a>"
+                            }</small></p>
                         </div>
                     </div>
                 </div>
@@ -67,20 +83,88 @@ export const displayArticle = (data) => {
 };
 
 export const friendsList = (data) => {
-    let output = ` `;
-    console.log(data);
-    data.forEach((friend) => {
-      const { first_name, last_name, job, birthday, email } = friend;
-      output += `
-              <a href="#" class="list-group-item list-group-item-action">
-              <div class="d-flex w-100 justify-content-between">
-                <h5 class="mb-1">${first_name} ${last_name}</h5>
-                <small>${birthday}</small>
-              </div>
-              <p class="mb-1">${job}</p>
-              <small>${email}</small>
+  let output = ` `;
+  console.log(data);
+  data.forEach((friend) => {
+    const { first_name, last_name, job, birthday, email } = friend;
+    //./account.php?api_key=${getKey()}
+    output += `
+        <div class="friends">
+            <a href="#" class="list-group-item list-group-item-action">
+                <div class="d-flex w-100 justify-content-between">
+                    <h5 class="mb-1">${first_name} ${last_name}</h5>
+                    <small>${birthday}</small>
+                </div>
+                <p class="mb-1">${job}</p>
+                <small>${email}</small>
+                <input type="hidden" value="${email}">
             </a>
+        </div>
               `;
+  });
+  return output;
+};
+
+export const viewProfile = (email) => {
+  return new Promise((resolve, reject) => {
+    apiCall({
+      type: "get_user_profile",
+      email: email,
+      api_key: getKey(),
+    }).then((data) => {
+      $.cookie("account", JSON.stringify(data));
+      resolve(data);
     });
-    return output;
-  };
+  });
+};
+
+export const displayProfile = (data) => {
+  console.log(data);
+  data = JSON.parse(data);
+  const friends = data["data"]["friends"];
+  console.log(friends);
+  const {
+    first_name,
+    last_name,
+    birthday,
+    email,
+    job,
+    relationship,
+    image_name,
+    api_key,
+  } = data["data"][0];
+  let profile = `<div class="mx-auto my-auto">
+        <img src="../../gallery/${image_name}" class="card-img-top rounded-circle" alt="Profile Picture">
+    </div>
+    <div class="card-body">
+        <h5 class="card-title">${first_name} ${last_name}</h5>
+    </div>
+    <ul class="list-group list-group-flush">
+    ${(function () {
+      if (friends) {
+        return `<li class="list-group-item"><strong>Birthday:</strong>${birthday}</li>
+        <li class="list-group-item"><strong>Contact Information:</strong>${email}</li>
+        <li class="list-group-item"><strong>Relationship Status:</strong>${relationship}</li>
+        <li class="list-group-item"><strong>Job:</strong>${job}</li>`;
+      } else {
+        return "";
+      }
+    })()}
+    </ul>`;
+  return profile;
+};
+
+export const takeToProfile = (me) => {
+  let email = $(me).closest(".friends").find("input[type='hidden']").val();
+
+  console.log(email);
+  viewProfile(email)
+    .then((data) => {
+      console.log(data);
+      $.cookie("account", JSON.stringify(data));
+      console.log($.cookie("account"));
+    })
+    .then
+    //(window.location.href = `./account.php?api_key=${getKey()}`)
+    ();
+};
