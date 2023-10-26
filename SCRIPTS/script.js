@@ -1,5 +1,5 @@
 $(document).ready(() => {
-  $("#login_submit").click(() => {
+  /*$("#login_submit").click(() => {
     $("#first_name").removeAttr("required");
     $("#last_name").removeAttr("required");
     $("#type").val("login");
@@ -7,13 +7,13 @@ $(document).ready(() => {
     if (document.getElementById("login_form").checkValidity())
       $("#login_form").submit();
   });
-
+*/
   /*$("#add_article").click(() => {
     if (document.getElementById("add_article_form").checkValidity())
       $("#add_article_form").submit();
   });*/
 
-  $("#sign_up").click(() => {
+  /*$("#sign_up").click(() => {
     if (
       $("#first_name_div").hasClass("sign-up") &&
       $("#last_name_div").hasClass("sign-up")
@@ -27,5 +27,5 @@ $(document).ready(() => {
       if (document.getElementById("login_form").checkValidity())
         $("#login_form").submit();
     }
-  });
+  });*/
 });

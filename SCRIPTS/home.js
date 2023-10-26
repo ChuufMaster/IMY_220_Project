@@ -2,7 +2,7 @@ import { apiCall, getKey, displayArticle } from "./helpers.js";
 import { apiURL } from "./configs.js";
 
 $(() => {
-  let tags ={tags: []};
+  let tags = { tags: [] };
   $("#addTag").on("click", () => {
     var tag = $("#tagInput").val();
     if (tag.trim() !== "") {
@@ -22,6 +22,11 @@ $(() => {
     const date = $("#date").val();
 
     const image = $("#image").get(0).files[0];
+    const size = $("#picture").get(0).files[0].size / 1024 / 1024;
+    if ((size > 0, 5)) {
+      alert("Image too large");
+      return false;
+    }
     var formData = new FormData();
     formData.append("title", title);
     formData.append("author", author);
@@ -43,7 +48,5 @@ $(() => {
         console.log(response);
       },
     });
-
-    
   });
 });

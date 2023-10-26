@@ -34,10 +34,10 @@ class API
 
     public function __construct()
     {
-        $this->host = "localhost";
+        /*$this->host = "localhost";
         $this->username = "u21456552";
         $this->password = "jdqmbgai";
-        $this->database_name = "u21456552";
+        $this->database_name = "u21456552";*/
         //$this->username = "root";
         //$this->password = "";
         //$this->database_name = "imy_21456552";
@@ -66,7 +66,7 @@ class API
             if (!isset($data[$to_check]) || empty($to_check))
                 $this->return_data('400', $message, 'error');
         }
-        catch (error)
+        catch (Error $error)
         {
             $this->return_data('500', $message, 'error');
         }
@@ -106,6 +106,48 @@ class API
         return $response;
     }
 
+    private function add_image($data)
+    {
+        if (!isset($_FILES['image']))
+        {
+
+            $this->return_data('400', $_FILES['image'], 'error');
+        }
+
+        $image_name = "";
+
+        $filetype = array('jpeg', 'jpg', 'png', 'gif', 'PNG', 'JPEG', 'JPG');
+        foreach ($_FILES as $key)
+        {
+
+            $gallery = dirname(dirname(__FILE__)) . '/gallery';
+            if (!file_exists($gallery))
+            {
+                mkdir($gallery, 0755, true);
+            }
+
+            $image_name = uniqid("image_", true) . ".png";
+            $path = dirname(dirname(__FILE__)) . '/gallery/' . $image_name;
+            $file_ext = pathinfo($image_name, PATHINFO_EXTENSION);
+            if (in_array(strtolower($file_ext), $filetype))
+            {
+
+                if (move_uploaded_file($key['tmp_name'], $path))
+                {
+                }
+                else
+                {
+                    $this->return_data('400', 'image couldn\'t be uploaded', 'error');
+                }
+
+            }
+            else
+            {
+                $this->return_data('400', 'Incorrect file type be uploaded', 'error');
+            }
+        }
+    }
+
     public function request()
     {
         $json = file_get_contents('php://input');
@@ -120,7 +162,6 @@ class API
         if (!isset($data) || empty($data))
         {
             $this->return_data('400', 'Request Body expected', "error");
-            //$this->return_data('400', $data, "error");
         }
 
         $this->getType($data);
@@ -131,7 +172,6 @@ class API
     {
         $this->check_set('type', 'Type must be set', $data);
         $type = $data['type'];
-        //$this->return_data('400', 'Request Body expected', "error");
 
         switch ($type)
         {
@@ -184,7 +224,6 @@ class API
 
     private function sign_up($request_body)
     {
-        // Validate the input
         $email = $request_body['email'];
         $password = $request_body['password'];
         $first_name = $request_body['first_name'];
@@ -197,30 +236,21 @@ class API
             );
             $this->return_data('400', $send, "error");
         }
-        // Check if the user already exists
         $statement = [
             "tables" => "users",
             "where" => [
-                "email" => $email
+                "email" => [$email, '=']
             ]
             ];
 
         $result = $this->db->SELECT($statement);
-        if ($result->num_rows > 0)
+        if ($result && $result->num_rows > 0)
         {
             $send = array(
                 'message' => "An account already exists with that Email."
             );
             $this->return_data('400', $send, "error");
         }
-        // Generate a random salt
-        //$salt = bin2hex(random_bytes(6));
-
-        // Combine the salt with the password
-        //$salted_password = $salt . $password;
-
-        // Hash the salted password
-        //$hashed_password = password_hash($salted_password, PASSWORD_DEFAULT);
 
         $api_key = bin2hex(random_bytes(16));
         $statement = [
@@ -233,8 +263,7 @@ class API
                 "api_key" => $api_key
             ]
             ];
-        $this->db->INSERT($statement);
-
+        $result = $this->db->INSERT($statement);
 
         $random_images = [
             'doodle.png',
@@ -242,24 +271,28 @@ class API
             'raccoon.jpg',
             'react.jpeg'
         ];
+
         $statement = [
-            'table' => 'gallery',
+            'table' => 'profilegallery',
             'data' => [
                 'api_key' => $api_key,
                 'image_name' => $random_images[array_rand($random_images)]
             ]
             ];
-        $this->db->INSERT($statement);
-        $send = array(
-            'message' => "Signup successful!"
-        );
+        $result = $this->db->INSERT($statement);
+
+
+        if (!$result)
+        {
+            $this->return_data("500", $result, 'error');
+        }
+
         $return = array(
-            'message' => "Login Successful!",
+            'message' => "Signup successful!",
             'api_key' => $api_key
         );
-        header("Location: PAGES/activity.php?api_key=$api_key");
-        exit();
-        //$this->return_data('200', $send, "success");
+
+        $this->return_data('200', $return, "success");
     }
 
     private function handleLoginRequest($request_body)
@@ -275,7 +308,6 @@ class API
 
             $this->return_data('400', $return, "error");
         }
-        // Check if the user already exists
         $statement = [
             "tables" => "users",
              "where" => [
@@ -296,7 +328,6 @@ class API
         }
         $row = $result->fetch_assoc();
         $db_password = $row['password'];
-        //$salted_password = $row['salt'] . $password;
         if ($password === $db_password)
         {
             $api_key = $row['api_key'];
@@ -304,9 +335,7 @@ class API
                 'message' => "Login Successful!",
                 'api_key' => $api_key
             );
-            header("Location: PAGES/activity.php?api_key=$api_key");
-            exit();
-            //$this->return_data('200', $return, "Success");
+            $this->return_data('200', $return, "Success");
         }
         else
         {
@@ -321,7 +350,6 @@ class API
     private function get_by_conditions($data)
     {
         $this->check_set('tables', 'Table must be set', $data);
-        //$this->check_set('where', 'Conditions must be set', $data);
 
         $results = $this->db->SELECT($data);
         if (gettype($results) === 'string')
@@ -376,21 +404,18 @@ class API
 
                 if (move_uploaded_file($key['tmp_name'], $path))
                 {
-                    //echo 'yes';
                 }
                 else
                 {
-                    //echo 'no';
                 }
 
             }
             else
             {
                 echo "FILE_TYPE_ERROR";
-            } // Its simple code.Its not with proper validation.
+            }
         }
 
-        //echo ($data['tags']);
         $statement = [
             'table' => "tbarticles",
             'data' => [
@@ -400,7 +425,6 @@ class API
                     'author' => $data['author'],
                     'date' => $data['date'],
                     'body' => $data['body'],
-                    //'tags' => json_encode($data['tags'])
                     'tags' => $data['tags']
                 ]
             ];
@@ -424,8 +448,6 @@ class API
         {
             $this->return_data('400', $result, 'error');
         }
-        //header("Location: PAGES/home.php?api_key=" . $statement['api_key']);
-        //exit();
         $this->return_data('200', 'Article Successfully added', 'success');
     }
 
@@ -680,7 +702,6 @@ class API
         {
             $response[] = $row;
         }
-        //var_dump($response);
         $friendTest = [
             'tables' => 'friends',
             'where' => [
@@ -696,8 +717,6 @@ class API
             $this->return_data("500", $result, 'error');
         }
 
-
-        //var_dump($friendResult);
         if ($friendResult->num_rows > 0)
         {
 
@@ -805,27 +824,18 @@ class API
 
                 if (move_uploaded_file($key['tmp_name'], $path))
                 {
-                    //echo 'yes';
                 }
                 else
                 {
-                    //echo 'no';
                 }
 
             }
             else
             {
                 echo "FILE_TYPE_ERROR";
-            } // Its simple code.Its not with proper validation.
+            }
         }
 
-        /*$statement = [
-            'table' => 'profilegallery',
-            'data' => [
-                'api_key' => $data['api_key'],
-                'image_name' => $image_name
-            ]
-            ];*/
         $statement = [
             'table' => 'profilegallery',
             'data' => [
@@ -839,7 +849,6 @@ class API
         if (gettype($result) === 'string')
         {
 
-            //$result = $this->db->UPDATE($statement);
             $this->return_data('400', $result, 'error');
 
         }

@@ -107,11 +107,19 @@ $(() => {
         if (picCheck) {
           picCheck = false;
 
+          
           const picture = $("#picture").get(0).files[0];
+          
+          const size = $("#picture").get(0).files[0].size / 1024 / 1024;
+          if ((size > 0.5)) {
+            console.log(size);
+            alert('Image too large');
+            return false;
+          }
           var formData = new FormData();
           formData.append("picture", picture);
           formData.append("api_key", getKey());
-          formData.append("type", 'update_profile_pic');
+          formData.append("type", "update_profile_pic");
           $.ajax({
             type: "POST",
             url: apiURL,

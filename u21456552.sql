@@ -166,7 +166,7 @@ CREATE TABLE `users` (
   `email` varchar(64) NOT NULL,
   `password` varchar(64) NOT NULL,
   `api_key` varchar(32) NOT NULL,
-  `birthday` date NOT NULL DEFAULT 'YYYY-MM-DD',
+  `birthday` date NOT NULL DEFAULT '2002-04-23',
   `relationship` varchar(32) NOT NULL,
   `job` varchar(64) NOT NULL
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_general_ci;
