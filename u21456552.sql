@@ -69,6 +69,7 @@ CREATE TABLE `profilegallery` (
 -- Dumping data for table `profilegallery`
 --
 
+
 INSERT INTO `profilegallery` (`api_key`, `image_name`) VALUES
 ('231a2b1295d7c9b8057f56b91bf99318', 'image_65398eb0514892.82858848.png'),
 ('6004f995a3a0b738c19dede26d8e1025', 'image_65398e7e237ef4.84971179.png'),
@@ -88,7 +89,7 @@ CREATE TABLE `tbarticles` (
   `author` varchar(100) NOT NULL,
   `date` date NOT NULL,
   `body` text NOT NULL,
-  `tags` longtext CHARACTER SET utf8mb4 COLLATE utf8mb4_bin NOT NULL DEFAULT '{"tags": ["article"]}'
+  `tags` longtext CHARACTER SET utf8mb4 COLLATE utf8mb4_bin NOT NULL
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_general_ci;
 
 --
@@ -165,7 +166,7 @@ CREATE TABLE `users` (
   `email` varchar(64) NOT NULL,
   `password` varchar(64) NOT NULL,
   `api_key` varchar(32) NOT NULL,
-  `birthday` date NOT NULL DEFAULT current_timestamp(),
+  `birthday` date NOT NULL DEFAULT 'YYYY-MM-DD',
   `relationship` varchar(32) NOT NULL,
   `job` varchar(64) NOT NULL
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_general_ci;

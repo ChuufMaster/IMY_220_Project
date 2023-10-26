@@ -1,3 +1,4 @@
 {
-    "apiURL": "https://localhost/IMY_220_Project/API.php"
+    "apiURL_home": "https://localhost/IMY_220_Project/API.php",
+    "apiURL": "http://imy.up.ac.za/u21456552/API.php"
 }
