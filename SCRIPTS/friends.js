@@ -5,6 +5,7 @@ import {
   friendsList,
   viewProfile,
   takeToProfile,
+  addToList,
 } from "./helpers.js";
 
 $(() => {
@@ -39,6 +40,9 @@ $(() => {
           $(".friends").on("click", function (event) {
             takeToProfile(this);
           });
-        });
-    });
+        }).then(
+          addToList()
+        );
+        
+    })
 });

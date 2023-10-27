@@ -92,7 +92,7 @@ export const displayArticle = (data) => {
                                   ) +
                                   "</a>"
                                 }</small></p>
-                                <input type="hidden" value="${article_id}">
+                                <input class="articleID" type="hidden" value="${article_id}">
                                 ${(function () {
                                   var lister = "";
                                   article.list.lists.forEach((list) => {
@@ -295,3 +295,17 @@ export const takeToProfile = (me) => {
   //  $.cookie(`account${getKey()}`, JSON.stringify(data));
   //})
 };
+
+export const addToList = () => {
+  $(".dropdown-item").on("click", function () {
+    //console.log('found');
+    const list = $(this).closest('li').find('input').val();
+    const article = $(this).closest('.card-body').find('.articleID').val();
+    console.log(list, article);
+    apiCall(
+      {
+        type: ''
+      }
+    )
+  });
+}

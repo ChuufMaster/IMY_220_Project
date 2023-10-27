@@ -216,6 +216,9 @@ class API
             case 'update_profile_pic':
                 $this->update_profile_pic($data);
                 break;
+            case 'add_to_list':
+                $this->add_to_list($data);
+                break;
             default:
                 $this->return_data('400', 'Type is expected or is incorrect', 'error');
                 break;
@@ -590,7 +593,7 @@ class API
         $statement = [
             'tables' => ["friends"],
             'left_join' => [
-                'tables' => ['users', 'tbarticles', 'tbgallery'],
+                'tables' => ['users', 'tbarticles', 'tbgallery', 'lists'],
                 'columns' => [
                     ['api_key' => [
                         ['friends', 'friend_id'], '='
@@ -600,6 +603,9 @@ class API
                     ]],
                     ["article_id" => [
                         ["tbarticles", "article_id"], "="
+                    ]],
+                    ['api_key' => [
+                        $data['api_key'], '='
                     ]]
 
                 ]
@@ -793,6 +799,49 @@ class API
             $this->return_data("500", $result, "error");
         }
         $this->return_data('200', 'List successfully added', 'Success');
+    }
+
+    public function add_to_list($data){
+        $this->check_set('api_key', 'Api key expected', $data);
+        $this->check_set('list_name', 'List Name expected', $data);
+        $this->check_set('article_id', 'Article id expected', $data);
+
+        $statement = [
+            'tables' => 'lists',
+            "columns" => ['list'],
+            'where' => [
+                'api_key' => [$data['api_key'], '=']
+            ]
+            ];
+            $lists = $this->db->SELECT($statement);
+            $lists_object = $this->get_response($lists);
+
+            //var_dump($lists_object);
+            $tragetList = [];
+            $count = 0;
+            foreach ($lists_object[0]["list"]["lists"] as $list) {
+                if($list['name'] === $data['list_name']){
+                    array_push($lists_object[0]['list']['lists'][$count]['articles'], $data['article_id'].'');
+                }
+                $count++;
+            }
+
+        $statement = [
+            'table' => 'lists',
+            'data' => [
+                'list' => json_encode($lists_object[0]['list'])
+            ],
+            'where' => [
+                'api_key' => [$data['api_key'], '='],
+            ]
+
+            ];
+       $result = $this->db->UPDATE($statement);
+        if (gettype($result) == "string")
+        {
+            $this->return_data("500", $result, "error");
+        }
+        $this->return_data('200', 'Article added to list successfully updated', 'Success');
     }
 
     public function update_info($data)

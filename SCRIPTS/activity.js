@@ -1,4 +1,4 @@
-import { apiCall, getKey, displayArticle } from "./helpers.js";
+import { apiCall, getKey, displayArticle, addList, addToList} from "./helpers.js";
 
 const activity = apiCall(
     {
@@ -8,4 +8,6 @@ const activity = apiCall(
 )
 .then((data) => {
     $("#activityFeed").html(displayArticle(data["data"]));
-})
+}).then(
+    addToList()
+)
