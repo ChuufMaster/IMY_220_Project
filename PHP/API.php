@@ -281,7 +281,20 @@ class API
             ];
         $result = $this->db->INSERT($statement);
 
+        $list_default = [
+            'lists' => [
+                ['articles' => [], 'name' => 'default']
+            ]
+        ];
 
+        $statement = [
+            'table' => 'lists',
+            'data' => [
+                'api_key' => $request_body['api_key'],
+                'list' => $list_default
+            ]
+            ];
+        $result = $this->db->INSERT($statement);
         if (!$result)
         {
             $this->return_data("500", $result, 'error');
