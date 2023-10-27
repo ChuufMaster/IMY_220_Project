@@ -123,7 +123,11 @@ class Database
         $table = ($table !== '' ? $table . '.' : '');
         foreach ($conditions as $column => $value)
         {
-            $condition .= "$table$column $value[1] " . (is_array($value[0]) ? $value[0][0] . "." . $value[0][1] : "'" . $value[0] . "'") . " " . (isset($value[2]) ? $value[2].' ' : '');
+            $ticks = '';
+            if(!isset($value[3])){
+                $ticks ="'";
+            }
+            $condition .= "$table$column $value[1] " . (is_array($value[0]) ? $value[0][0] . "." . $value[0][1] : "$ticks" . $value[0] . "$ticks") . " " . (isset($value[2]) ? $value[2].' ' : '');
         }
         return $condition;
     }
@@ -152,7 +156,7 @@ class Database
             $query .= "$table $table ON ";
             foreach ($join["columns"][$table_index] as $column => $value)
             {
-                $query .= "$table.$column $value[1] " . (is_array($value[0]) ? $value[0][0] . "." . $value[0][1] : $value[0]);
+                $query .= "$table.$column $value[1] " . (is_array($value[0]) ? $value[0][0] . "." . $value[0][1] : "'".$value[0]."'");
             }
         }
         return $query;

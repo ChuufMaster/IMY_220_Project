@@ -21,23 +21,19 @@ export const getKey = () => {
 };
 
 export const displayArticle = (data) => {
-  //  console.log(data);
+  console.log(data);
   let output = ` `;
   //const lists = addList();
   //addList().then((lists) => {
   //console.log(lists);
-  var lister = " ";
-  apiCall({
-    type: "get_lists",
-    api_key: getKey(),
-  }).then((data) => {
-    data.data.forEach((list) => {
-      lister += `
+  //var lister = " ";
+  /*data.data.forEach((list) => {
+    lister += `
          <li>
            <a class="dropdown-item" href="#">${list.name}</a>
          </li>`;
-    });
-    const lists = `
+  });
+  const lists = `
           <div class="btn-group">
             <button class="btn btn-secondary btn-sm dropdown-toggle" type="button" data-bs-toggle="dropdown" aria-expanded="false">
               ADD TO LIST
@@ -46,23 +42,22 @@ export const displayArticle = (data) => {
              ${lister}
             </ul>
           </div>
-        `;
-    console.log(lister);
-    lister = lists;
-    return lister;
-  }).then(lists => {
-    data.forEach((article) => {
-      const {
-        image_name,
-        title,
-        author,
-        description,
-        article_id,
-        body,
-        date,
-        tags,
-      } = article;
-      output += `
+        `;*/
+  //console.log(lister);
+  //lister = lists;
+
+  data.forEach((article) => {
+    const {
+      image_name,
+      title,
+      author,
+      description,
+      article_id,
+      body,
+      date,
+      tags,
+    } = article;
+    output += `
             <div class="col-6">
             <div class="p-1 card h-100 fancy">
             <span class="top-key"></span>
@@ -98,7 +93,32 @@ export const displayArticle = (data) => {
                                   "</a>"
                                 }</small></p>
                                 <input type="hidden" value="${article_id}">
-                                ${lists}
+                                ${(function () {
+                                  var lister = "";
+                                  article.list.lists.forEach((list) => {
+                                    lister += `
+                                         <li>
+                                           <a class="dropdown-item" href="#">${list.name}</a>
+                                           <input type="hidden" value="${list.name}">
+                                         </li>`;
+                                  });
+                                  const lists = `
+                                          <div class="btn-group">
+                                            <button class="btn btn-secondary btn-sm dropdown-toggle" type="button" data-bs-toggle="dropdown" aria-expanded="false">
+                                              ADD TO LIST
+                                            </button>
+                                            <ul class="dropdown-menu">
+                                             ${lister}
+                                            <li><hr class="dropdown-divider"></li>
+                                            <li>
+                                              <a class="dropdown-item" href="#">Add List</a>
+                                              <input type="hidden" value="addList">
+                                            </li>
+                                            </ul>
+                                          </div>
+                                        `;
+                                  return lists;
+                                })()}
                             </div>
                         </div>
                     </div>
@@ -108,42 +128,87 @@ export const displayArticle = (data) => {
             </div>
         </div>
             `;
-      //return output;
-    });
-    //console.log(output);
-    //resolve(output);
-    //});
-    return output;
   });
-  //let lists = addList();
+
+  return output;
 };
 
-export const addList = () => {
-  var lister = " ";
-  apiCall({
-    type: "get_lists",
-    api_key: getKey(),
-  }).then((data) => {
-    data.data.forEach((list) => {
-      lister += `
-         <li>
-           <a class="dropdown-item" href="#">${list.name}</a>
-         </li>`;
-    });
-    const lists = `
-          <div class="btn-group">
-            <button class="btn btn-secondary btn-sm dropdown-toggle" type="button" data-bs-toggle="dropdown" aria-expanded="false">
-              ADD TO LIST
-            </button>
-            <ul class="dropdown-menu">
-             ${lister}
-            </ul>
-          </div>
-        `;
-    console.log(lister);
-    lister = lists;
-    return lister;
-  });
+export const addList = () => {};
+
+export const getLists = (data) => {
+  
+    //console.log(data);
+    //data.data.forEach((list) =>
+    let output = '';
+    for(const [key, value] of Object.entries(data.data)) {
+      //console.log(value);
+      output+= `
+
+      <div class="card">
+      <h1 class="card-head">
+        ${key}
+      </h1>
+      <div class="row g-3 mx-3 my-3">
+      `+value[0].map((article) => {
+        const {
+          image_name,
+          title,
+          author,
+          description,
+          article_id,
+          body,
+          date,
+          tags,
+        } = article;
+        return `
+                <div class="col-6">
+                <div class="p-1 card h-100 fancy">
+                <span class="top-key"></span>
+                <span class="text">
+                        <div class="row g-0">
+                            <div class="col-4">
+                                <div class="image-container">
+                                    <img src="../../gallery/${image_name}" alt="Article Image" class="img-fluid">
+                                </div>
+                            </div>
+                            <div class="col-8">
+                                <div class="card-body">
+                                    <h5 class="card-title">${title}</h5>
+                                    <h6 class="card-subtitle"> - ${author}</h6>
+                                    <p class="card-text">${description}</p>
+                                    <a class="fancy" data-bs-toggle="collapse" href="#body${article_id}" role="button" aria-expand="false" aria-controls="body${article_id}">
+                                        <span class="top-key"></span>
+                                        <span class="text">FULL ARTICLE</span>
+                                        <span class="bottom-key-1"></span>
+                                        <span class="bottom-key-2"></span>
+                                    </a>
+                                    <div class="collapse" id="body${article_id}">
+                                        <div class="card card-body">
+                                            ${body}
+                                        </div>
+                                    </div>
+                                    <p class="card-text"><small class="text-muted">${date}</small></p>
+                                    <p class="card-text"><small class="text-muted">${
+                                      '<a class="link-primary" href="#"">#' +
+                                      tags.tags.join(
+                                        '</a>, <a class="link-primary" href="#">#'
+                                      ) +
+                                      "</a>"
+                                    }</small></p>
+                                    <input type="hidden" value="${article_id}">
+                                </div>
+                            </div>
+                        </div>
+                    </span>
+                    <span class="bottom-key-1"></span>
+                    <span class="bottom-key-2"></span>
+                </div>
+            </div>
+            
+                `;
+      }).join('\n')+`</div></div>`;
+    };
+  return output;
 };
 
 export const friendsList = (data) => {

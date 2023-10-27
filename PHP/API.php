@@ -453,13 +453,17 @@ class API
 
     public function get_activity($data)
     {
+        $this->check_set('api_key', 'Api key expected', $data);
         $statement = [
             'tables' => ["tbarticles"],
             'left_join' => [
-                "tables" => ['tbgallery'],
+                "tables" => ['tbgallery', 'lists'],
                 'columns' => [
                         ["article_id" => [
                             ["tbarticles", "article_id"], "="
+                        ]],
+                        ['api_key' => [
+                            $data['api_key'], '='
                         ]]
                     ]
                     ],
@@ -470,17 +474,7 @@ class API
             ]
             ];
         $result = $this->db->SELECT($statement);
-        if (gettype($result) === 'string')
-        {
-            $this->return_data("500", $result, 'error');
-        }
-        while ($row = mysqli_fetch_assoc($result))
-        {
-            $tags = json_decode($row['tags'], true);
-            $row['tags'] = $tags;
-            $response[] = $row;
-        }
-
+        $response = $this->get_response($result);
         $this->return_data('200', $response, 'Success');
     }
 
@@ -525,10 +519,13 @@ class API
         $statement = [
             'tables' => ["tbarticles"],
             'left_join' => [
-                "tables" => ['tbgallery'],
+                "tables" => ['tbgallery', 'lists'],
                 'columns' => [
                         ["article_id" => [
                             ["tbarticles", "article_id"], "="
+                        ]],
+                        ['api_key' => [
+                            $data['api_key'], '='
                         ]]
                     ]
                     ],
@@ -545,17 +542,7 @@ class API
             ];
 
         $result = $this->db->SELECT($statement);
-        if (gettype($result) == 'string')
-        {
-            $this->return_data("500", $result, 'error');
-        }
-
-        while ($row = mysqli_fetch_assoc($result))
-        {
-            $tags = json_decode($row['tags'], true);
-            $row['tags'] = $tags;
-            $response[] = $row;
-        }
+        $response = $this->get_response($result);
 
         $this->return_data('200', $response, 'Success');
     }
@@ -734,16 +721,42 @@ class API
     public function get_lists($data)
     {
         $this->check_set('api_key', 'Api key expected', $data);
-        $statement = [
+
+        $getLists = [
             'tables' => 'lists',
             'where' => [
                 'api_key' => [$data['api_key'], '=']
             ]
             ];
+        $listResult = $this->db->SELECT($getLists);
 
-        $result = $this->db->SELECT($statement);
-        $response = $this->get_response($result);
-        $this->return_data('200', $response, 'Success');
+        $lister = $this->get_response($listResult);
+        foreach ($lister[0]['list']['lists'] as $list)
+        {
+            $articles = implode(', ', $list['articles']);
+            $statement = [
+                'tables' => ['tbarticles'],
+                'left_join' => [
+                    "tables" => ['tbgallery', 'lists'],
+                    'columns' => [
+                            ["article_id" => [
+                                ["tbarticles", "article_id"], "="
+                            ]],
+                            ['api_key' => [
+                                $data['api_key'], '='
+                            ]]
+                        ]
+                        ],
+                'where' => [
+                    'tbarticles' => [
+                    'article_id' => ['', 'IN', "($articles)", false],]
+                ]
+                ];
+            $artResult = $this->db->SELECT($statement);
+            $articleResponse[$list['name']] = [$this->get_response($artResult)];
+        }
+
+        $this->return_data('200', $articleResponse, 'Success');
     }
 
     public function add_list($data)
