@@ -40,6 +40,7 @@ $(() => {
         const first_name = $("#first_name").val();
         const last_name = $("#last_name").val();
 
+        console.log(email, password, first_name, last_name);
         $.ajax({
           type: "POST",
           url: "./PHP/API.php",

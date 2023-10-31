@@ -23,28 +23,6 @@ export const getKey = () => {
 export const displayArticle = (data) => {
   console.log(data);
   let output = ` `;
-  //const lists = addList();
-  //addList().then((lists) => {
-  //console.log(lists);
-  //var lister = " ";
-  /*data.data.forEach((list) => {
-    lister += `
-         <li>
-           <a class="dropdown-item" href="#">${list.name}</a>
-         </li>`;
-  });
-  const lists = `
-          <div class="btn-group">
-            <button class="btn btn-secondary btn-sm dropdown-toggle" type="button" data-bs-toggle="dropdown" aria-expanded="false">
-              ADD TO LIST
-            </button>
-            <ul class="dropdown-menu">
-             ${lister}
-            </ul>
-          </div>
-        `;*/
-  //console.log(lister);
-  //lister = lists;
 
   data.forEach((article) => {
     const {
@@ -112,7 +90,7 @@ export const displayArticle = (data) => {
                                             <li><hr class="dropdown-divider"></li>
                                             <li>
                                               <a class="dropdown-item" href="#">Add List</a>
-                                              <input type="hidden" value="addList">
+                                              <input class="newList" type="text" value="" placeholder="List Name">
                                             </li>
                                             </ul>
                                           </div>
@@ -297,14 +275,29 @@ export const takeToProfile = (me) => {
 };
 
 export const addToList = () => {
+  console.log('found');
   $(".dropdown-item").on("click", function () {
-    //console.log('found');
     const list = $(this).closest('li').find('input').val();
     const article = $(this).closest('.card-body').find('.articleID').val();
     console.log(list, article);
+
+    if($(this).closest('li').find('input').hasClass('newList')){
+      apiCall(
+        {
+          type: 'add_list',
+          api_key: getKey(),
+          list_name: list,
+          article_id: article
+        }
+      )
+      return;
+    }
     apiCall(
       {
-        type: ''
+        type: 'add_to_list',
+        api_key: getKey(),
+        list_name: list,
+        article_id: article,
       }
     )
   });

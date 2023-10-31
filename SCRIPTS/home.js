@@ -22,8 +22,8 @@ $(() => {
     const date = $("#date").val();
 
     const image = $("#image").get(0).files[0];
-    const size = $("#picture").get(0).files[0].size / 1024 / 1024;
-    if ((size > 0, 5)) {
+    const size = $("#image").get(0).files[0].size / 1024 / 1024;
+    if ((size > 1)) {
       alert("Image too large");
       return false;
     }
